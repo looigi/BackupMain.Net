@@ -78,10 +78,10 @@ Public Class GestioneMAIL
 
                 ScriveLogPosta(" OK")
             Catch ex As SmtpException
-                ScriveLogPosta("Errore " & ex.InnerException.Message)
+                ScriveLogPosta("Errore " & ex.Message)
                 errore = True
             Catch ex As Exception
-                ScriveLogPosta("Errore " & ex.InnerException.Message)
+                ScriveLogPosta("Errore " & ex.Message)
                 errore = True
             End Try
             gf = Nothing

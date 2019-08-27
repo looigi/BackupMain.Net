@@ -197,9 +197,16 @@ Module mdlGenerale
         Dim Ritorno As String = ""
 
         If Lettera <> "C:" And Lettera.Trim <> "" Then
-            Dim Path As String = Lettera & "\Buttami.txt"
+			Dim gf As New GestioneFilesDirectory
+			Dim Lettera2 As String = Lettera
+			If Not Lettera2.EndsWith("\") Then
+				Lettera2 &= "\"
+			End If
+			gf.CreaDirectoryDaPercorso(Lettera2)
 
-            Try
+			Dim Path As String = Lettera & "\Buttami.txt"
+
+			Try
                 Dim fs As FileStream = File.Create(Path)
 
                 ' Add text to the file.
@@ -210,22 +217,24 @@ Module mdlGenerale
                 Ritorno = ex.Message
             End Try
 
-            If Ritorno = "" Then
-                Dim gf As New GestioneFilesDirectory
-                Dim Stringa As String = gf.LeggeFileIntero(Path)
-                If Stringa <> "ppp" Then
-                    Ritorno = "Errore in fase di lettura disco"
-                End If
-            End If
+			If Ritorno = "" Then
+				Dim Stringa As String = gf.LeggeFileIntero(Path)
+				If Stringa <> "ppp" Then
+					Ritorno = "Errore in fase di lettura disco"
+				End If
+			Else
+			End If
 
-            Try
+			Try
                 Kill(Path)
             Catch ex As Exception
 
             End Try
-        End If
 
-        Return Ritorno
+			gf = Nothing
+		End If
+
+		Return Ritorno
     End Function
 
     Public Function ControllaDischi(idProc As Integer, clLog As LogCasareccio.LogCasareccio.Logger, txtNomeProcedura As TextBox, lstOperazioni As ListBox) As Boolean

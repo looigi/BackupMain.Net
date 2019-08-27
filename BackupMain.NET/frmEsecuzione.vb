@@ -55,7 +55,12 @@ Public Class frmEsecuzione
         log = New StringBuilder
         log.Append("Inizio log: " & PrendeDataOra() & vbCrLf)
 
-        PulisceFileDiLog()
+		'Dim NomeFileUltimaOperazione As String = Application.StartupPath & "\UltimaOperazione.txt"
+		'Dim gf As New GestioneFilesDirectory
+		'gf.EliminaFileFisico(NomeFileUltimaOperazione)
+		'gf = Nothing
+
+		PulisceFileDiLog()
 
         Riga = 0
 
@@ -124,7 +129,7 @@ Public Class frmEsecuzione
 
         End Try
 
-        If ModalitaEsecuzioneAutomatica Then
+		If ModalitaEsecuzioneAutomatica Then
             ' Me.WindowState = FormWindowState.Minimized
         End If
     End Sub
@@ -133,8 +138,8 @@ Public Class frmEsecuzione
     Private ProgressivoInterno As String
 
     Private Sub EsegueOperazione()
-        Try
-            Dim Operazione As Integer = Rec(Riga, StrutturaTabella.idOperazione)
+		' Try
+		Dim Operazione As Integer = Rec(Riga, StrutturaTabella.idOperazione)
             Dim Origine As String = Rec(Riga, StrutturaTabella.Origine)
             Dim Destinazione As String = Rec(Riga, StrutturaTabella.Destinazione)
 
@@ -201,20 +206,20 @@ Public Class frmEsecuzione
             opFile = Nothing
 
             opeFileGlobale.ChiudeDBLog()
-            'opeFileGlobale = Nothing
-        Catch ex As Exception
-            log.Append("")
-            log.Append("Operazione " & ProgressivoInterno & ". ERRORE: " & ex.Message)
-            log.Append("")
-        End Try
+		'opeFileGlobale = Nothing
+		'Catch ex As Exception
+		'    log.Append("")
+		'    log.Append("Operazione " & ProgressivoInterno & ". ERRORE: " & ex.Message)
+		'    log.Append("")
+		'End Try
 
-        If Blocca = True And Skippa = True Then
+		If Blocca = True And Skippa = True Then
             Blocca = False
             Skippa = False
-            cmdPausa.Enabled = True
-            cmdStop.Enabled = True
-            cmdSkip.Enabled = True
-        End If
+			'cmdPausa.Enabled = True
+			'cmdStop.Enabled = True
+			'cmdSkip.Enabled = True
+		End If
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick

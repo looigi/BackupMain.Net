@@ -153,35 +153,37 @@ Public Class frmMain
 
         End Try
 
-        ' BUTTAMI
-        'Dim Operazione2 As String = "Zippa Sorgenti"
+		' BUTTAMI
+		'Dim Operazione2 As String = "Zippa Sorgenti"
 
-        'Dim Ok As Boolean = False
+		'Dim Ok As Boolean = False
 
-        'For i As Integer = 0 To lstProcedure.Items.Count
-        '    If lstProcedure.Items(i).ToString.ToUpper.Trim = Operazione2.ToUpper.Trim Then
-        '        lstProcedure.SelectedIndex = i
-        '        Ok = True
-        '        Exit For
-        '    End If
-        'Next
+		'For i As Integer = 0 To lstProcedure.Items.Count
+		'    If lstProcedure.Items(i).ToString.ToUpper.Trim = Operazione2.ToUpper.Trim Then
+		'        lstProcedure.SelectedIndex = i
+		'        Ok = True
+		'        Exit For
+		'    End If
+		'Next
 
-        'If Ok Then
-        '    Dim gf2 As New GestioneFilesDirectory
-        '    gf2.CreaDirectoryDaPercorso("C:\BackupLog\Dati\")
-        '    gf2 = Nothing
+		'If Ok Then
+		'    Dim gf2 As New GestioneFilesDirectory
+		'    gf2.CreaDirectoryDaPercorso("C:\BackupLog\Dati\")
+		'    gf2 = Nothing
 
-        '    Dim datella As String = Now.Year & Format(Now.Month, "00") & Format(Now.Day, "00") & Format(Now.Hour, "00") & Format(Now.Minute, "00") & Format(Now.Second, "00")
-        '    File.Copy(PercorsoDB & "\DB\dbBackup.mdb", "C:\BackupLog\Dati\Dbtemp" & datella & ".mdb")
-        '    PercorsoDB = "C:\BackupLog\Dati\Dbtemp" & datella & ".mdb"
-        '    PercorsoDBTemp = PercorsoDB
+		'    Dim datella As String = Now.Year & Format(Now.Month, "00") & Format(Now.Day, "00") & Format(Now.Hour, "00") & Format(Now.Minute, "00") & Format(Now.Second, "00")
+		'    File.Copy(PercorsoDB & "\DB\dbBackup.mdb", "C:\BackupLog\Dati\Dbtemp" & datella & ".mdb")
+		'    PercorsoDB = "C:\BackupLog\Dati\Dbtemp" & datella & ".mdb"
+		'    PercorsoDBTemp = PercorsoDB
 
-        '    ModalitaEsecuzioneAutomatica = True
-        '    Call lstProcedure_DoubleClick(sender, e)
-        'End If
-        ' BUTTAMI
+		'    ModalitaEsecuzioneAutomatica = True
+		'    Call lstProcedure_DoubleClick(sender, e)
+		'End If
+		' BUTTAMI
 
-        Dim CommandLineArguments As String() = Environment.GetCommandLineArgs()
+		ControllaNuoveTabelle
+
+		Dim CommandLineArguments As String() = Environment.GetCommandLineArgs()
 
         If CommandLineArguments.Length > 2 Then
             If CommandLineArguments(1) = "/RUN" Then
@@ -219,33 +221,62 @@ Public Class frmMain
 
     End Sub
 
-    'Private Sub ControllaPermessiDiScritturaSuCartellaDiLavoro(PercorsoDB As String)
-    '    Dim gf As New GestioneFilesDirectory
-    '    gf.EliminaFileFisico(PercorsoDB & "\Db\Buttami.txt")
-    '    Try
-    '        gf.CreaAggiornaFile(PercorsoDB & "\Db\Buttami.txt", "prova")
-    '    Catch ex As Exception
+	Private Sub ControllaNuoveTabelle()
+		Dim DB As New OperazioniSuFile.GestioneACCESS
 
-    '    End Try
-    '    If File.Exists(PercorsoDB & "\Db\Buttami.txt") = False Then
-    '        Dim p As Process = New Process()
-    '        Dim pi As ProcessStartInfo = New ProcessStartInfo()
-    '        Dim permanent As Boolean = True
-    '        Dim command As String = "icacls """ & PercorsoDB & "\Db"""
-    '        Dim arguments As String = "/grant Users:(OI)(CI)F /t"
+		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
+			Dim ConnSQL As Object = DB.ApreDB(0, Nothing)
+			Dim Rec As Object = CreateObject("ADODB.Recordset")
+			Dim Sql As String
 
-    '        pi.Arguments = " " + If(permanent = True, "/K", "/C") + " " + command + " " + arguments
-    '        pi.FileName = "cmd.exe"
-    '        p.StartInfo.CreateNoWindow = True
-    '        p.StartInfo = pi
-    '        p.Start()
-    '        p.WaitForExit()
-    '    End If
-    '    gf.EliminaFileFisico(PercorsoDB & "\Db\Buttami.txt")
-    '    gf = Nothing
-    'End Sub
+			Sql = "Select * From UltimeDirOrig"
+			Rec = DB.LeggeQuery(0, ConnSQL, Sql, Nothing)
+			If Rec Is Nothing Then
+				Sql = "Create Table UltimeDirOrig (Dir Memo, PRIMARY KEY (Dir))"
+				DB.EsegueSql(-1, ConnSQL, Sql, Nothing)
+			Else
+				Rec.Close
+			End If
 
-    Public Sub CaricaProcedure(clLog As LogCasareccio.LogCasareccio.Logger)
+			'Sql = "Select * From UltimeDirDestin"
+			'Rec = DB.LeggeQuery(0, ConnSQL, Sql, Nothing)
+			'If Rec Is Nothing Then
+			'	Sql = "Create Table UltimeDirDestin (Dir Memo, PRIMARY KEY (Dir))"
+			'	DB.EsegueSql(-1, ConnSQL, Sql, Nothing)
+			'Else
+			'	Rec.Close
+			'End If
+		End If
+
+		DB = Nothing
+	End Sub
+	'Private Sub ControllaPermessiDiScritturaSuCartellaDiLavoro(PercorsoDB As String)
+	'    Dim gf As New GestioneFilesDirectory
+	'    gf.EliminaFileFisico(PercorsoDB & "\Db\Buttami.txt")
+	'    Try
+	'        gf.CreaAggiornaFile(PercorsoDB & "\Db\Buttami.txt", "prova")
+	'    Catch ex As Exception
+
+	'    End Try
+	'    If File.Exists(PercorsoDB & "\Db\Buttami.txt") = False Then
+	'        Dim p As Process = New Process()
+	'        Dim pi As ProcessStartInfo = New ProcessStartInfo()
+	'        Dim permanent As Boolean = True
+	'        Dim command As String = "icacls """ & PercorsoDB & "\Db"""
+	'        Dim arguments As String = "/grant Users:(OI)(CI)F /t"
+
+	'        pi.Arguments = " " + If(permanent = True, "/K", "/C") + " " + command + " " + arguments
+	'        pi.FileName = "cmd.exe"
+	'        p.StartInfo.CreateNoWindow = True
+	'        p.StartInfo = pi
+	'        p.Start()
+	'        p.WaitForExit()
+	'    End If
+	'    gf.EliminaFileFisico(PercorsoDB & "\Db\Buttami.txt")
+	'    gf = Nothing
+	'End Sub
+
+	Public Sub CaricaProcedure(clLog As LogCasareccio.LogCasareccio.Logger)
         Dim DB As New OperazioniSuFile.GestioneACCESS
 
         If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then

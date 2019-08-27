@@ -497,7 +497,9 @@ Public Class frmProcedura
 
             DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
 
-            ConnSQL.close()
+			OrdinaOperazioni(idProc, ConnSQL, DB)
+
+			ConnSQL.close()
             ConnSQL = Nothing
 
             Dim opFile As New OperazioniSuFile.OperazioniSuFile
@@ -512,7 +514,26 @@ Public Class frmProcedura
         DB = Nothing
     End Sub
 
-    Private Sub cmbOperazioni_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbOperazioni.SelectedIndexChanged
+	Private Sub OrdinaOperazioni(idProc As Integer, ConnSql As Object, DB As GestioneACCESS)
+		Dim Sql As String = "Drop Table Appoggio"
+		DB.EsegueSql(idProc, ConnSql, Sql, Nothing)
+
+		Sql = "SELECT idProc, (SELECT Count(*) FROM DettaglioProcedure T2 WHERE t2.Origine+str(t2.Progressivo) < DettaglioProcedure.Origine+str(DettaglioProcedure.Progressivo)) As Progressivo, " &
+			"idOperazione, Origine, Destinazione, Sovrascrivi, Sottodirectory, Filtro, Parametro, UtenzaOrigine, PasswordOrigine, UtenzaDestinazione, PasswordDestinazione, Attivo " &
+			"Into Appoggio " &
+			"FROM DettaglioProcedure " &
+			"WHERE idProc = " & idProc & " " &
+			"ORDER BY DettaglioProcedure.Origine, DettaglioProcedure.Destinazione"
+		DB.EsegueSql(idProc, ConnSql, Sql, Nothing)
+
+		Sql = "Delete * From DettaglioProcedure Where idProc = " & idProc
+		DB.EsegueSql(idProc, ConnSql, Sql, Nothing)
+
+		Sql = "Insert Into DettaglioProcedure Select * From Appoggio"
+		DB.EsegueSql(idProc, ConnSql, Sql, Nothing)
+	End Sub
+
+	Private Sub cmbOperazioni_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbOperazioni.SelectedIndexChanged
         ImpostaVisualizzazione(cmbOperazioni.Text)
         chkAttivo.Checked = True
     End Sub
