@@ -289,16 +289,21 @@ Public Class frmEsecuzione
         Blocca = True
         Skippa = False
 
-        If opeFileGlobale Is Nothing = False Then
-            cmdPausa.Enabled = False
-            cmdStop.Enabled = False
-            cmdSkip.Enabled = False
+		Dim NomeFileUltimaOperazione As String = Application.StartupPath & "\UltimaOperazione.txt"
+		Dim gf As New GestioneFilesDirectory
+		gf.EliminaFileFisico(NomeFileUltimaOperazione)
+		gf = Nothing
 
-            opeFileGlobale.ImpostaPausa(False)
-            opeFileGlobale.ImpostaBlocco()
-            opeFileGlobale.ImpostaSkippa(False)
-        End If
-    End Sub
+		If opeFileGlobale Is Nothing = False Then
+			cmdPausa.Enabled = False
+			cmdStop.Enabled = False
+			cmdSkip.Enabled = False
+
+			opeFileGlobale.ImpostaPausa(False)
+			opeFileGlobale.ImpostaBlocco()
+			opeFileGlobale.ImpostaSkippa(False)
+		End If
+	End Sub
 
     Private Sub cmdRipristina_Click(sender As Object, e As EventArgs) Handles cmdRipristina.Click
         If opeFileGlobale Is Nothing = False Then
