@@ -338,8 +338,8 @@ Public Class frmEsecuzione
         NomeFileErrori = NomeFileErrori.Replace(Estensione, "") & "_ERR_" & Estensione
         Dim gf2 As New GestioneFilesDirectory
         gf.ApreFilePerLettura(NomeFileLog)
-        Dim sLine As String = ""
-        Do
+		Dim sLine As String = ""
+		Do
             sLine = gf.RitornaRiga
             If Not sLine Is Nothing Then
                 If sLine.ToUpper.Contains("ERROR") Or sLine.ToUpper.Contains("IMPOSSIBILE") Then
@@ -374,7 +374,10 @@ Public Class frmEsecuzione
 
             Dim DataOra As String = Now.Year.ToString.Trim & Format(Now.Month, "00") & Format(Now.Day, "00") & "_" & Format(Now.Hour, "00") & Format(Now.Minute, "00") & Format(Now.Second, "00")
 
-            Dim NomeFileErrori As String = ControllaErroriSuFileLog()
+			lblOperazione.Text = "Controllo errori"
+			Application.DoEvents()
+
+			Dim NomeFileErrori As String = ControllaErroriSuFileLog()
             EliminaFilesVecchi()
 
             If Esci = True Then
