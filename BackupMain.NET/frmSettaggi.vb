@@ -9,7 +9,7 @@ Public Class frmSettaggi
     End Sub
 
     Private Sub frmSettaggi_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim opFiles As New OperazioniSuFile.OperazioniSuFile
+        Dim opFiles As New OperazioniSuFile
         Dim LetteraLibera As String = opFiles.PrendeLetteraDiscoLibero
         Dim LetteraDisco As String = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\BackupNet", "LetteraDisco", "")
         If LetteraDisco = "" Then
@@ -26,7 +26,7 @@ Public Class frmSettaggi
         'End If
 
         'Dim Lettera As String = txtLettera.Text
-        'Dim opFiles As New OperazioniSuFile.OperazioniSuFile
+        'Dim opFiles As New OperazioniSuFile
 
         'If opFiles.EsisteLetteraDisco(Lettera) Then
         '    MsgBox("La lettera del disco esiste già.", MsgBoxStyle.Exclamation)
@@ -43,7 +43,7 @@ Public Class frmSettaggi
         End If
 
         Dim Lettera As String = txtLettera.Text
-        Dim opFiles As New OperazioniSuFile.OperazioniSuFile
+        Dim opFiles As New OperazioniSuFile
 
         If opFiles.EsisteLetteraDisco(Lettera) Then
             MsgBox("La lettera del disco esiste già.", MsgBoxStyle.Exclamation)
@@ -57,7 +57,7 @@ Public Class frmSettaggi
 
     Private Sub cmdEliminaDatiSI_Click(sender As Object, e As EventArgs) Handles cmdEliminaDatiSI.Click
         If MsgBox("Si è sicuri di voler eliminare tutti i dati della sincronia intelligente ?", vbYesNo + vbInformation + vbDefaultButton2) = vbYes Then
-            Dim DB As New OperazioniSuFile.GestioneACCESS
+            Dim DB As New GestioneACCESS
 
             If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
                 Dim ConnSQL As Object = DB.ApreDB(0, Nothing)
@@ -78,7 +78,7 @@ Public Class frmSettaggi
 
             DB = Nothing
 
-            Dim opFiles As New OperazioniSuFile.GestioneACCESS
+            Dim opFiles As New GestioneACCESS
             opFiles.CompattazioneDb()
             opFiles = Nothing
 
@@ -87,7 +87,7 @@ Public Class frmSettaggi
     End Sub
 
     Private Sub btnEliminaVecchiFiles_Click(sender As Object, e As EventArgs) Handles btnEliminaVecchiFiles.Click
-        Dim q As Integer = EliminaFilesVecchi()
-        MsgBox("Files eliminati: " & q, vbInformation)
+		Dim q As Integer = EliminaFilesVecchi(Me)
+		MsgBox("Files eliminati: " & q, vbInformation)
     End Sub
 End Class

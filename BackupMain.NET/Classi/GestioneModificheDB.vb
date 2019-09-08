@@ -1,7 +1,7 @@
 ﻿Public Class GestioneModificheDB
     Public Sub ControllaDB(PercorsoDb As String, clLog As LogCasareccio.LogCasareccio.Logger)
-        Dim DBSQLCE As New OperazioniSuFile.GestioneACCESS
-        Dim DBAccess As New OperazioniSuFile.GestioneACCESS
+        Dim DBSQLCE As New GestioneACCESS
+        Dim DBAccess As New GestioneACCESS
         Dim CopiateTabelle As Boolean = False
 
         If DBSQLCE.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB", 2) = True Then

@@ -222,7 +222,7 @@ Public Class frmMain
     End Sub
 
 	Private Sub ControllaNuoveTabelle()
-		Dim DB As New OperazioniSuFile.GestioneACCESS
+		Dim DB As New GestioneACCESS
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
 			Dim ConnSQL As Object = DB.ApreDB(0, Nothing)
@@ -277,252 +277,252 @@ Public Class frmMain
 	'End Sub
 
 	Public Sub CaricaProcedure(clLog As LogCasareccio.LogCasareccio.Logger)
-        Dim DB As New OperazioniSuFile.GestioneACCESS
+		Dim DB As New GestioneACCESS
 
-        If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-            Dim ConnSQL As Object = DB.ApreDB(0, clLog)
-            Dim Rec As Object = CreateObject("ADODB.Recordset")
-            Dim Sql As String
+		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
+			Dim ConnSQL As Object = DB.ApreDB(0, clLog)
+			Dim Rec As Object = CreateObject("ADODB.Recordset")
+			Dim Sql As String
 
-            lstProcedure.Items.Clear()
-            'cmbProcedure.Items.Add("")
-            'cmbProcedure.Items.Add("NUOVA PROCEDURA")
+			lstProcedure.Items.Clear()
+			'cmbProcedure.Items.Add("")
+			'cmbProcedure.Items.Add("NUOVA PROCEDURA")
 
-            Sql = "Select * From NomiProcedure Order By NomeProcedura"
-            Rec = DB.LeggeQuery(0, ConnSQL, Sql, clLog)
-            Do Until Rec.Eof
-                lstProcedure.Items.Add(Rec("NomeProcedura").Value)
+			Sql = "Select * From NomiProcedure Order By NomeProcedura"
+			Rec = DB.LeggeQuery(0, ConnSQL, Sql, clLog)
+			Do Until Rec.Eof
+				lstProcedure.Items.Add(Rec("NomeProcedura").Value)
 
-                Rec.MoveNext()
-            Loop
-            Rec.Close()
+				Rec.MoveNext()
+			Loop
+			Rec.Close()
 
-            ConnSQL.close()
-            ConnSQL = Nothing
+			ConnSQL.close()
+			ConnSQL = Nothing
 
-            lstProcedure.Text = ""
+			lstProcedure.Text = ""
 
-            DB.ChiudeDB(True, ConnSQL)
-        End If
+			DB.ChiudeDB(True, ConnSQL)
+		End If
 
-        cmdElimina.Visible = True
-        DB = Nothing
-    End Sub
+		cmdElimina.Visible = True
+		DB = Nothing
+	End Sub
 
-    Private Sub DisegnaDischi(Optional pDischi() As String = Nothing, Optional qDischi2 As Integer = -1)
-        'If qDischi2 = -1 Then
-        '    Dim gfd As New GestioneFilesDirectory
-        '    Dischi = gfd.RitornaDischi
-        '    qDischi = Dischi.Count - 1
-        '    gfd = Nothing
-        'Else
-        '    Dischi = pDischi
-        '    qDischi = qDischi2
-        'End If
+	Private Sub DisegnaDischi(Optional pDischi() As String = Nothing, Optional qDischi2 As Integer = -1)
+		'If qDischi2 = -1 Then
+		'    Dim gfd As New GestioneFilesDirectory
+		'    Dischi = gfd.RitornaDischi
+		'    qDischi = Dischi.Count - 1
+		'    gfd = Nothing
+		'Else
+		'    Dischi = pDischi
+		'    qDischi = qDischi2
+		'End If
 
-        'Dim y As Integer = 3
-        'Dim x As Integer = 3
-        'Dim Immagine As String = ""
-        'Dim Campi() As String
+		'Dim y As Integer = 3
+		'Dim x As Integer = 3
+		'Dim Immagine As String = ""
+		'Dim Campi() As String
 
-        'For i As Integer = 0 To qDischi
-        '    If Dischi(i) <> "" Then
-        '        Campi = Dischi(i).Split(";")
+		'For i As Integer = 0 To qDischi
+		'    If Dischi(i) <> "" Then
+		'        Campi = Dischi(i).Split(";")
 
-        '        lblNomeDisco = New Label
-        '        lblNomeDisco.Size = New Size(300, 20)
-        '        lblNomeDisco.Location = New Point(x + 105, y + 15)
-        '        lblNomeDisco.Font = New Font("Arial", "10", FontStyle.Bold, GraphicsUnit.Point)
-        '        lblNomeDisco.Text = Campi(5)
+		'        lblNomeDisco = New Label
+		'        lblNomeDisco.Size = New Size(300, 20)
+		'        lblNomeDisco.Location = New Point(x + 105, y + 15)
+		'        lblNomeDisco.Font = New Font("Arial", "10", FontStyle.Bold, GraphicsUnit.Point)
+		'        lblNomeDisco.Text = Campi(5)
 
-        '        lblLetteraDisco = New Label
-        '        lblLetteraDisco.Size = New Size(40, 20)
-        '        lblLetteraDisco.Location = New Point(x + 60, y + 20)
-        '        lblLetteraDisco.Font = New Font("Arial", "10", FontStyle.Bold, GraphicsUnit.Point)
-        '        lblLetteraDisco.Text = Campi(7)
+		'        lblLetteraDisco = New Label
+		'        lblLetteraDisco.Size = New Size(40, 20)
+		'        lblLetteraDisco.Location = New Point(x + 60, y + 20)
+		'        lblLetteraDisco.Font = New Font("Arial", "10", FontStyle.Bold, GraphicsUnit.Point)
+		'        lblLetteraDisco.Text = Campi(7)
 
-        '        lblSerialeDisco = New Label
-        '        lblSerialeDisco.Size = New Size(300, 20)
-        '        lblSerialeDisco.Location = New Point(x + 105, y + 35)
-        '        lblSerialeDisco.Font = New Font("Arial", "7", FontStyle.Regular, GraphicsUnit.Point)
-        '        lblSerialeDisco.Text = Campi(6)
+		'        lblSerialeDisco = New Label
+		'        lblSerialeDisco.Size = New Size(300, 20)
+		'        lblSerialeDisco.Location = New Point(x + 105, y + 35)
+		'        lblSerialeDisco.Font = New Font("Arial", "7", FontStyle.Regular, GraphicsUnit.Point)
+		'        lblSerialeDisco.Text = Campi(6)
 
-        '        Select Case Campi(0)
-        '            Case "CD-ROM"
-        '                Immagine = "CD.jpg"
-        '            Case "Disco Fisso"
-        '                Immagine = "hd.jpg"
-        '            Case "Rimuovibile"
-        '                Immagine = "usb.jpg"
-        '            Case "Sconosciuto"
-        '                Immagine = "floppy.jpg"
-        '        End Select
+		'        Select Case Campi(0)
+		'            Case "CD-ROM"
+		'                Immagine = "CD.jpg"
+		'            Case "Disco Fisso"
+		'                Immagine = "hd.jpg"
+		'            Case "Rimuovibile"
+		'                Immagine = "usb.jpg"
+		'            Case "Sconosciuto"
+		'                Immagine = "floppy.jpg"
+		'        End Select
 
-        '        imgDisco = New PictureBox
-        '        imgDisco.Width = 55
-        '        imgDisco.Height = 55
-        '        imgDisco.ImageLocation = "Immagini\" & Immagine
-        '        imgDisco.SizeMode = PictureBoxSizeMode.StretchImage
-        '        imgDisco.BorderStyle = BorderStyle.FixedSingle
-        '        imgDisco.Top = y
-        '        imgDisco.Left = x
+		'        imgDisco = New PictureBox
+		'        imgDisco.Width = 55
+		'        imgDisco.Height = 55
+		'        imgDisco.ImageLocation = "Immagini\" & Immagine
+		'        imgDisco.SizeMode = PictureBoxSizeMode.StretchImage
+		'        imgDisco.BorderStyle = BorderStyle.FixedSingle
+		'        imgDisco.Top = y
+		'        imgDisco.Left = x
 
-        '        cmdDisco = New Button
-        '        cmdDisco.Size = New Size(40, 40)
-        '        cmdDisco.Location = New Point(x + 405, y + 5)
-        '        cmdDisco.Name = i
-        '        cmdDisco.Text = "->"
+		'        cmdDisco = New Button
+		'        cmdDisco.Size = New Size(40, 40)
+		'        cmdDisco.Location = New Point(x + 405, y + 5)
+		'        cmdDisco.Name = i
+		'        cmdDisco.Text = "->"
 
-        '        y += 60
+		'        y += 60
 
-        '        'AddHandler cmdDisco.Click, AddressOf cmdDisco_onClick
+		'        'AddHandler cmdDisco.Click, AddressOf cmdDisco_onClick
 
-        '        'Me.Controls.Add(cmdDisco)
-        '        Me.Controls.Add(lblNomeDisco)
-        '        Me.Controls.Add(lblLetteraDisco)
-        '        Me.Controls.Add(lblSerialeDisco)
-        '        Me.Controls.Add(imgDisco)
-        '    End If
-        'Next
+		'        'Me.Controls.Add(cmdDisco)
+		'        Me.Controls.Add(lblNomeDisco)
+		'        Me.Controls.Add(lblLetteraDisco)
+		'        Me.Controls.Add(lblSerialeDisco)
+		'        Me.Controls.Add(imgDisco)
+		'    End If
+		'Next
 
-        'cmdRoutine.Top = y ' + 40
-        'cmdRoutine.Visible = True
+		'cmdRoutine.Top = y ' + 40
+		'cmdRoutine.Visible = True
 
-        'cmbProcedure.Top = y ' + 40
-        'cmbProcedure.Visible = True
+		'cmbProcedure.Top = y ' + 40
+		'cmbProcedure.Visible = True
 
-        'Dim sx As Integer = My.Computer.Screen.Bounds.Width
-        'Dim sy As Integer = My.Computer.Screen.Bounds.Height
+		'Dim sx As Integer = My.Computer.Screen.Bounds.Width
+		'Dim sy As Integer = My.Computer.Screen.Bounds.Height
 
-        'Me.Height = y + 70
-        'Me.Top = (sy / 2) - (Me.Height / 2)
-    End Sub
+		'Me.Height = y + 70
+		'Me.Top = (sy / 2) - (Me.Height / 2)
+	End Sub
 
-    'Private Sub cmdDisco_onClick(sender As Object, e As EventArgs)
-    '    Dim b As Button = DirectCast(sender, Button)
-    '    Dim nome As String = b.Name
+	'Private Sub cmdDisco_onClick(sender As Object, e As EventArgs)
+	'    Dim b As Button = DirectCast(sender, Button)
+	'    Dim nome As String = b.Name
 
-    '    MsgBox(nome)
-    'End Sub
+	'    MsgBox(nome)
+	'End Sub
 
-    Private Sub cmdRoutine_Click(sender As Object, e As EventArgs) Handles cmdRoutine.Click
-        'Dim NomeProc As String = cmbProcedure.Text
+	Private Sub cmdRoutine_Click(sender As Object, e As EventArgs) Handles cmdRoutine.Click
+		'Dim NomeProc As String = cmbProcedure.Text
 
-        'If NomeProc = "" Then
-        '    MsgBox("Selezionare una procedura", MsgBoxStyle.Information)
-        '    Exit Sub
-        'End If
+		'If NomeProc = "" Then
+		'    MsgBox("Selezionare una procedura", MsgBoxStyle.Information)
+		'    Exit Sub
+		'End If
 
-        'If NomeProc = "NUOVA PROCEDURA" Then
-        'NomeProc = ""
-        'End If
+		'If NomeProc = "NUOVA PROCEDURA" Then
+		'NomeProc = ""
+		'End If
 
-        NomeProceduraScelta = ""
+		NomeProceduraScelta = ""
 
-        'Dim Ok As Boolean = True
-        'Dim Quale As Integer
+		'Dim Ok As Boolean = True
+		'Dim Quale As Integer
 
-        'For i As Integer = 1 To qMaschereProcedura
-        '    If MascheraProcedura(i) Is Nothing Then
-        '        Quale = i
-        '        Ok = False
-        '        Exit For
-        '    End If
-        'Next
-        'If Ok Then
-        '    qMaschereProcedura += 1
-        '    ReDim Preserve MascheraProcedura(qMaschereProcedura)
-        '    MascheraProcedura(qMaschereProcedura) = New frmProcedura
-        '    Quale = qMaschereProcedura
-        'Else
-        '    MascheraProcedura(Quale) = New frmProcedura
-        'End If
+		'For i As Integer = 1 To qMaschereProcedura
+		'    If MascheraProcedura(i) Is Nothing Then
+		'        Quale = i
+		'        Ok = False
+		'        Exit For
+		'    End If
+		'Next
+		'If Ok Then
+		'    qMaschereProcedura += 1
+		'    ReDim Preserve MascheraProcedura(qMaschereProcedura)
+		'    MascheraProcedura(qMaschereProcedura) = New frmProcedura
+		'    Quale = qMaschereProcedura
+		'Else
+		'    MascheraProcedura(Quale) = New frmProcedura
+		'End If
 
-        'MascheraProcedura(Quale).ImpostaNomeProcedura("", Quale)
-        'MascheraProcedura(Quale).Show()
+		'MascheraProcedura(Quale).ImpostaNomeProcedura("", Quale)
+		'MascheraProcedura(Quale).Show()
 
-        frmProcedura.ImpostaNomeProcedura("", -1)
-        frmProcedura.Show()
+		frmProcedura.ImpostaNomeProcedura("", -1)
+		frmProcedura.Show()
 
-        Me.Hide()
-    End Sub
+		Me.Hide()
+	End Sub
 
-    Private Sub lstProcedure_DoubleClick(sender As Object, e As EventArgs) Handles lstProcedure.DoubleClick
-        Dim NomeProc As String = lstProcedure.Text
+	Private Sub lstProcedure_DoubleClick(sender As Object, e As EventArgs) Handles lstProcedure.DoubleClick
+		Dim NomeProc As String = lstProcedure.Text
 
-        If NomeProc = "" Then
-            MsgBox("Selezionare una procedura", MsgBoxStyle.Information)
-            Exit Sub
-        End If
+		If NomeProc = "" Then
+			MsgBox("Selezionare una procedura", MsgBoxStyle.Information)
+			Exit Sub
+		End If
 
-        NomeProceduraScelta = NomeProc
+		NomeProceduraScelta = NomeProc
 
-        'Dim Ok As Boolean = True
-        'Dim Quale As Integer
+		'Dim Ok As Boolean = True
+		'Dim Quale As Integer
 
-        'For i As Integer = 0 To qMaschereProcedura - 1
-        '    If MascheraProcedura(i) Is Nothing Then
-        '        Quale = i
-        '        Ok = False
-        '        Exit For
-        '    End If
-        'Next
-        'If Ok Then
-        '    qMaschereProcedura += 1
-        '    ReDim Preserve MascheraProcedura(qMaschereProcedura)
-        '    MascheraProcedura(qMaschereProcedura) = New frmProcedura
-        '    Quale = qMaschereProcedura
-        'Else
-        '    ReDim Preserve MascheraProcedura(0)
-        '    MascheraProcedura(Quale) = New frmProcedura
-        'End If
+		'For i As Integer = 0 To qMaschereProcedura - 1
+		'    If MascheraProcedura(i) Is Nothing Then
+		'        Quale = i
+		'        Ok = False
+		'        Exit For
+		'    End If
+		'Next
+		'If Ok Then
+		'    qMaschereProcedura += 1
+		'    ReDim Preserve MascheraProcedura(qMaschereProcedura)
+		'    MascheraProcedura(qMaschereProcedura) = New frmProcedura
+		'    Quale = qMaschereProcedura
+		'Else
+		'    ReDim Preserve MascheraProcedura(0)
+		'    MascheraProcedura(Quale) = New frmProcedura
+		'End If
 
-        'MascheraProcedura(Quale).ImpostaNomeProcedura(NomeProc, Quale)
-        'MascheraProcedura(Quale).Show()
+		'MascheraProcedura(Quale).ImpostaNomeProcedura(NomeProc, Quale)
+		'MascheraProcedura(Quale).Show()
 
-        frmProcedura.ImpostaNomeProcedura(NomeProc, -1)
-        frmProcedura.Show()
+		frmProcedura.ImpostaNomeProcedura(NomeProc, -1)
+		frmProcedura.Show()
 
-        If ModalitaEsecuzioneAutomatica Then
-            Me.Top = -1000
-            Me.ShowInTaskbar = False
-        Else
-            Me.WindowState = FormWindowState.Minimized
-            Me.Hide()
-            Minimizzato = True
-        End If
-    End Sub
+		If ModalitaEsecuzioneAutomatica Then
+			Me.Top = -1000
+			Me.ShowInTaskbar = False
+		Else
+			Me.WindowState = FormWindowState.Minimized
+			Me.Hide()
+			Minimizzato = True
+		End If
+	End Sub
 
-    Private Sub cmdSetup_Click(sender As Object, e As EventArgs) Handles cmdSetup.Click
-        frmSettaggi.Show()
+	Private Sub cmdSetup_Click(sender As Object, e As EventArgs) Handles cmdSetup.Click
+		frmSettaggi.Show()
 
-        Me.Hide()
-    End Sub
+		Me.Hide()
+	End Sub
 
-    Private Sub cmdUscita_Click(sender As Object, e As EventArgs) Handles cmdUscita.Click
-        If MsgBox("Si vuole uscire ?", vbYesNo + vbInformation + vbDefaultButton2) = vbYes Then
-            NotifyIcon1.Visible = False
-            Chiusura = True
-            End
-        End If
-    End Sub
+	Private Sub cmdUscita_Click(sender As Object, e As EventArgs) Handles cmdUscita.Click
+		If MsgBox("Si vuole uscire ?", vbYesNo + vbInformation + vbDefaultButton2) = vbYes Then
+			NotifyIcon1.Visible = False
+			Chiusura = True
+			End
+		End If
+	End Sub
 
-    Private Sub lstProcedure_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstProcedure.SelectedIndexChanged
-        cmdElimina.Visible = True
-    End Sub
+	Private Sub lstProcedure_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstProcedure.SelectedIndexChanged
+		cmdElimina.Visible = True
+	End Sub
 
-    Private Sub cmdElimina_Click(sender As Object, e As EventArgs) Handles cmdElimina.Click
-        If MsgBox("Si è sicuri di voler eliminare la procedura '" & lstProcedure.Text & "'", vbYesNo + vbInformation + vbDefaultButton2) = vbNo Then
-            Exit Sub
-        End If
+	Private Sub cmdElimina_Click(sender As Object, e As EventArgs) Handles cmdElimina.Click
+		If MsgBox("Si è sicuri di voler eliminare la procedura '" & lstProcedure.Text & "'", vbYesNo + vbInformation + vbDefaultButton2) = vbNo Then
+			Exit Sub
+		End If
 
-        Dim opFile As New OperazioniSuFile.OperazioniSuFile
-        Dim idProc As Integer = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lstProcedure.Text)
+		Dim opFile As New OperazioniSuFile
+		Dim idProc As Integer = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lstProcedure.Text)
         opFile = Nothing
 
-        Dim DB As New OperazioniSuFile.GestioneACCESS
+		Dim DB As New GestioneACCESS
 
-        If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
+		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
             Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
             Dim Sql As String
 
