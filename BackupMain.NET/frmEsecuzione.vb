@@ -1,9 +1,6 @@
-﻿Imports OperazioniSuFile
-Imports System.Text
+﻿Imports System.Text
 Imports System.IO
 Imports System.Threading
-Imports frmLog
-Imports OperazioniSuFile
 Imports BackupMain.NET.OperazioniSuFile
 
 Public Class frmEsecuzione
@@ -11,7 +8,6 @@ Public Class frmEsecuzione
 	Private NomeFileLog As String
 	Private Rec(,) As String
 	Private idProc As Integer
-	'Private NomeFileDiLog As String
 	Private log As StringBuilder
 	Private clLog As LogCasareccio.LogCasareccio.Logger
 	Private opeFileGlobale As OperazioniSuFile
