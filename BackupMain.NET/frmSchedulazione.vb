@@ -14,7 +14,7 @@
         NomeProcedura = Nome
         lblNomeProc.Text = Nome
 
-        Dim opFile As New OperazioniSuFile
+        Dim opFile As New OperazioniSuFile.OperazioniSuFile
         idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, Nome)
         opFile = Nothing
 
@@ -24,7 +24,7 @@
     End Sub
 
     Private Sub CaricaDati()
-        Dim DB As New GestioneACCESS
+        Dim DB As New OperazioniSuFile.GestioneACCESS
 
         If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
             Dim ConnSQL As Object = DB.ApreDB(0, Nothing)
@@ -236,7 +236,7 @@
             End If
         End If
 
-        Dim DB As New GestioneACCESS
+        Dim DB As New OperazioniSuFile.GestioneACCESS
 
         If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
             Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)

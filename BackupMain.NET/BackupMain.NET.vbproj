@@ -81,10 +81,6 @@
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Interop.JRO">
-      <HintPath>..\..\DLL-OperazioniSuFile\OperazioniSuFile\obj\Debug\Interop.JRO.dll</HintPath>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\AAA-ClassiUtili\Zip\Ionic.Zip.dll</HintPath>
@@ -95,7 +91,6 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
-    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -113,14 +108,7 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classi\GestioneACCESS.vb" />
     <Compile Include="Classi\GestioneFilesDirectory.vb" />
-    <Compile Include="Classi\MapUnMapDrives.vb" />
-    <Compile Include="Classi\mdlOpFile.vb" />
-    <Compile Include="Classi\OperazioniSuFile.vb" />
-    <Compile Include="Classi\OperazioniSuFileDettagli.vb" />
-    <Compile Include="Classi\SQLSERVER.vb" />
-    <Compile Include="Classi\ThreadAttesaOperazione.vb" />
     <Compile Include="Classi\GestioneMAIL.vb" />
     <Compile Include="Classi\GestioneMenu.vb">
       <SubType>Component</SubType>
@@ -266,6 +254,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DB\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DLL-OperazioniSuFile\OperazioniSuFile\OperazioniSuFile.vbproj">
+      <Project>{83ee6921-b1db-4321-97c1-e31763b3513d}</Project>
+      <Name>OperazioniSuFile</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Imports OperazioniSuFile
 Imports System.Text
-Imports OperazioniSuFile
+Imports OperazioniSuFile.OperazioniSuFile
 
 Public Class frmProcedura
     Private NomeProcedura As String
@@ -21,7 +21,7 @@ Public Class frmProcedura
     Private Sub frmProcedura_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         lblProgressivo.Text = ""
 
-        Dim op As New OperazioniSuFile
+        Dim op As New OperazioniSuFile.OperazioniSuFile
 
         Dim Operazioni() As String = op.TornaListaOperazioni
 
@@ -38,7 +38,7 @@ Public Class frmProcedura
     End Sub
 
     Private Sub ControllaSeCeLog()
-        'Dim DB As New GestioneACCESS
+        'Dim DB As New OperazioniSuFile.GestioneACCESS
 
         'If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp , "ConnDB") = True Then
         '    Dim ConnSQL As Object = DB.ApreDB(idProc)
@@ -85,7 +85,7 @@ Public Class frmProcedura
             lblNomeProc.Visible = True
             cmdRinomina.Visible = True
 
-            Dim opFile As New OperazioniSuFile
+            Dim opFile As New OperazioniSuFile.OperazioniSuFile
             idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, Nome, lstOperazioni)
             Dim Campi As String = opFile.CaricaDatiProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, idProc, Nothing)
             If Campi.Contains(";") Then
@@ -156,7 +156,7 @@ Public Class frmProcedura
         Dim Progressivo As String = Mid(Riga, 1, 2).Trim
         Dim Operazione As String = Mid(Riga, 4, 23).Trim
 
-        Dim DB As New GestioneACCESS
+        Dim DB As New OperazioniSuFile.GestioneACCESS
 
         If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
             Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
@@ -269,7 +269,7 @@ Public Class frmProcedura
     End Sub
 
     Private Sub cmdElimina_Click(sender As Object, e As EventArgs) Handles cmdElimina.Click
-        Dim DB As New GestioneACCESS
+        Dim DB As New OperazioniSuFile.GestioneACCESS
 
         If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
             Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
@@ -283,7 +283,7 @@ Public Class frmProcedura
             ConnSQL.close()
             ConnSQL = Nothing
 
-            Dim opFile As New OperazioniSuFile
+            Dim opFile As New OperazioniSuFile.OperazioniSuFile
             idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lblNomeProc.Text, lstOperazioni)
             opFile = Nothing
 
@@ -315,7 +315,7 @@ Public Class frmProcedura
     End Sub
 
     Private Sub SalvaOperazione()
-        Dim DB As New GestioneACCESS
+        Dim DB As New OperazioniSuFile.GestioneACCESS
 
         If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
             Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
@@ -323,40 +323,40 @@ Public Class frmProcedura
             Dim Sql As String
             Dim Progressivo As Integer
             Dim Operazione As Integer
-            Dim Op As New OperazioniSuFile
+            Dim Op As New OperazioniSuFile.OperazioniSuFile
 
             Select Case cmbOperazioni.Text
                 Case "Copia"
-                    Operazione = OperazioniSuFile.TipoOperazione.Copia
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.Copia
                 Case "Crea dir"
-                    Operazione = OperazioniSuFile.TipoOperazione.CreaDirectory
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.CreaDirectory
                 Case "Elimina dir"
-                    Operazione = OperazioniSuFile.TipoOperazione.EliminaDirectory
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.EliminaDirectory
                 Case "Elimina Files"
-                    Operazione = OperazioniSuFile.TipoOperazione.Eliminazione
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.Eliminazione
                 Case "Sincronizza"
-                    Operazione = OperazioniSuFile.TipoOperazione.Sincronizzazione
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.Sincronizzazione
                 Case "Sincronia Intelligente"
-                    Operazione = OperazioniSuFile.TipoOperazione.SincroniaIntelligente
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.SincroniaIntelligente
                 Case "Sposta"
-                    Operazione = OperazioniSuFile.TipoOperazione.Spostamento
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.Spostamento
                 Case "Riavvio PC"
-                    Operazione = OperazioniSuFile.TipoOperazione.RiavvioPC
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.RiavvioPC
                 Case "Avvia Servizio"
-                    Operazione = OperazioniSuFile.TipoOperazione.AvvioServizio
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.AvvioServizio
                 Case "Ferma Servizio"
-                    Operazione = OperazioniSuFile.TipoOperazione.FermaServizio
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.FermaServizio
                 Case "Avvia EXE"
-                    Operazione = OperazioniSuFile.TipoOperazione.AvviaEseguibile
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.AvviaEseguibile
                 Case "Ferma EXE"
-                    Operazione = OperazioniSuFile.TipoOperazione.FermaEseguibile
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.FermaEseguibile
                 Case "Attendi"
-                    Operazione = OperazioniSuFile.TipoOperazione.Attendi
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.Attendi
                 Case "Zip", "Lista Files"
                     If cmbOperazioni.Text = "Zip" Then
-                        Operazione = OperazioniSuFile.TipoOperazione.Zip
+                        Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.Zip
                     Else
-                        Operazione = OperazioniSuFile.TipoOperazione.ListaFiles
+                        Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.ListaFiles
                     End If
                     Dim Esisteva As Boolean = True
 
@@ -402,11 +402,11 @@ Public Class frmProcedura
                         End If
                     End If
                 Case "Messaggio"
-                    Operazione = OperazioniSuFile.TipoOperazione.Messaggio
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.Messaggio
                 Case "Esegue SQL Server"
-                    Operazione = OperazioniSuFile.TipoOperazione.EsegueSQL
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.EsegueSQL
                 Case Else
-                    Operazione = OperazioniSuFile.TipoOperazione.Nulla
+                    Operazione = OperazioniSuFile.OperazioniSuFile.TipoOperazione.Nulla
             End Select
 
             If idProc = -1 Then
@@ -502,7 +502,7 @@ Public Class frmProcedura
 			ConnSQL.close()
             ConnSQL = Nothing
 
-            Dim opFile As New OperazioniSuFile
+            Dim opFile As New OperazioniSuFile.OperazioniSuFile
             idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lblNomeProc.Text, lstOperazioni)
             opFile = Nothing
 
@@ -683,7 +683,7 @@ Public Class frmProcedura
     End Sub
 
     Private Sub cmdEsegue_Click(sender As Object, e As EventArgs)
-        Dim opeFileGlobale = New OperazioniSuFile
+        Dim opeFileGlobale = New OperazioniSuFile.OperazioniSuFile
         Dim clLog = New LogCasareccio.LogCasareccio.Logger
 
         Dim d As Date = Now
@@ -738,7 +738,7 @@ Public Class frmProcedura
             Exit Sub
         End If
 
-        Dim DB As New GestioneACCESS
+        Dim DB As New OperazioniSuFile.GestioneACCESS
 
         If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
             Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
@@ -775,7 +775,7 @@ Public Class frmProcedura
         Dim NuovoNome As String = InputBox(lblNomeProc.Text, "Nuovo nome procedura")
 
         If NuovoNome <> "" Then
-            Dim DB As New GestioneACCESS
+            Dim DB As New OperazioniSuFile.GestioneACCESS
 
             If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
                 Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
@@ -801,7 +801,7 @@ Public Class frmProcedura
     End Sub
 
     Private Sub cmdGiu_Click(sender As Object, e As EventArgs) Handles cmdGiu.Click
-        Dim DB As New GestioneACCESS
+        Dim DB As New OperazioniSuFile.GestioneACCESS
         Dim numRiga As Integer = lstOperazioni.SelectedIndex
 
         If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
@@ -838,7 +838,7 @@ Public Class frmProcedura
 
         DB = Nothing
 
-        Dim opFile As New OperazioniSuFile
+        Dim opFile As New OperazioniSuFile.OperazioniSuFile
         idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lblNomeProc.Text, lstOperazioni)
         opFile = Nothing
 
@@ -852,7 +852,7 @@ Public Class frmProcedura
     End Sub
 
     Private Sub cmdSu_Click(sender As Object, e As EventArgs) Handles cmdSu.Click
-        Dim DB As New GestioneACCESS
+        Dim DB As New OperazioniSuFile.GestioneACCESS
         Dim numRiga As Integer = lstOperazioni.SelectedIndex
 
         If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
@@ -889,7 +889,7 @@ Public Class frmProcedura
 
         DB = Nothing
 
-        Dim opFile As New OperazioniSuFile
+        Dim opFile As New OperazioniSuFile.OperazioniSuFile
         idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lblNomeProc.Text, lstOperazioni)
         opFile = Nothing
 
@@ -939,9 +939,9 @@ Public Class frmProcedura
     Private Sub CheckConnessione(Cartella As String, Utenza As String, Password As String)
         If Mid(Cartella, 1, 2) = "\\" Then
             Dim Messaggio As String = ""
-			Dim mud As New MapUnMapDrives
+            Dim mud As New OperazioniSuFile.MapUnMapDrives
 
-			Dim opFiles As New OperazioniSuFile
+            Dim opFiles As New OperazioniSuFile.OperazioniSuFile
             Dim LetteraLibera As String = opFiles.PrendeLetteraDiscoLibero
             Dim LetteraDisco As String = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\BackupNet", "LetteraDisco", "")
             If LetteraDisco = "" Then
@@ -1018,7 +1018,7 @@ Public Class frmProcedura
     End Sub
 
     Private Sub AttivaDisattivaRighe(Come As String)
-        Dim DB As New GestioneACCESS
+        Dim DB As New OperazioniSuFile.GestioneACCESS
 
         If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
             Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
@@ -1031,7 +1031,7 @@ Public Class frmProcedura
 
         DB = Nothing
 
-        Dim opFile As New OperazioniSuFile
+        Dim opFile As New OperazioniSuFile.OperazioniSuFile
         idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lblNomeProc.Text, lstOperazioni)
         opFile = Nothing
 
@@ -1073,7 +1073,7 @@ Public Class frmProcedura
             Exit Sub
         End If
 
-        Dim opeFileGlobale = New OperazioniSuFile
+        Dim opeFileGlobale = New OperazioniSuFile.OperazioniSuFile
         Dim clLog = New LogCasareccio.LogCasareccio.Logger
 
         Dim d As Date = Now
@@ -1153,7 +1153,7 @@ Public Class frmProcedura
         If Operazione.IndexOf("Intelligente") > -1 Then
             If MsgBox("Si vogliono eliminare i dati salvati della" & vbCrLf & "sincronia intelligente per l'operazione selezionata ?", vbYesNo + vbDefaultButton2 + vbInformation) = vbYes Then
                 Me.Cursor = Cursors.WaitCursor
-                Dim DB As New GestioneACCESS
+                Dim DB As New OperazioniSuFile.GestioneACCESS
                 If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
                     Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
                     Dim Sql As String = "Delete From FileDestinazioneIntelligente Where idProc=" & idProc & " And Operazione=" & Progressivo
@@ -1178,7 +1178,7 @@ Public Class frmProcedura
 
     Private Sub chkinviaMail_Click(sender As Object, e As EventArgs) Handles chkinviaMail.Click
         If idProc > 0 Then
-            Dim DB As New GestioneACCESS
+            Dim DB As New OperazioniSuFile.GestioneACCESS
             If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
                 Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
                 Dim InvioMail As String = IIf(chkinviaMail.Checked, "S", "N")
@@ -1203,7 +1203,7 @@ Public Class frmProcedura
         If Operazione.IndexOf("Intelligente") > -1 Then
             If MsgBox("Si vogliono eliminare i dati salvati della" & vbCrLf & "sincronia intelligente per la procedura ?", vbYesNo + vbDefaultButton2 + vbInformation) = vbYes Then
                 Me.Cursor = Cursors.WaitCursor
-                Dim DB As New GestioneACCESS
+                Dim DB As New OperazioniSuFile.GestioneACCESS
                 If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
                     Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
                     Dim Sql As String = "Delete From FileDestinazioneIntelligente Where idProc=" & idProc

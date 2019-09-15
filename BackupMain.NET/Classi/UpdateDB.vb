@@ -2,7 +2,7 @@
     Public VersioneDBApplicazione As Integer = 1
 
     Public Sub ControllaAggiornamentoDB(clLog As LogCasareccio.LogCasareccio.Logger)
-        Dim DB As New GestioneACCESS
+        Dim DB As New OperazioniSuFile.GestioneACCESS
 
         If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp , "ConnDB") = True Then
             Dim ConnSQL As Object = DB.ApreDB(0, clLog)
@@ -36,7 +36,7 @@
         End If
     End Sub
 
-    Private Sub EsegueAggiornamentoDB(DB As GestioneACCESS, Conn As Object, clLog As LogCasareccio.LogCasareccio.Logger)
+    Private Sub EsegueAggiornamentoDB(DB As OperazioniSuFile.GestioneACCESS, Conn As Object, clLog As LogCasareccio.LogCasareccio.Logger)
         Dim rec As Object = CreateObject("ADODB.Recordset")
         Dim Sql As String
         Dim VersioneDB As Integer = 0
