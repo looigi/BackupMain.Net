@@ -126,7 +126,7 @@ Public Class frmMain
 			PasswordMail = c(2)
 		Else
 			UtenzaMail = "looigi@gmail.com"
-			PasswordMail = "pippuzzetto227!"
+			PasswordMail = "Piripacchio227!"
 		End If
 
 		PercorsoDB = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\BackupNet", "PathDB", "")
@@ -210,6 +210,8 @@ Public Class frmMain
 					File.Copy(PercorsoDB & "\DB\dbBackup.mdb", "C:\BackupLog\Dati\Dbtemp" & datella & ".mdb")
 					PercorsoDB = "C:\BackupLog\Dati\Dbtemp" & datella & ".mdb"
 					PercorsoDBTemp = PercorsoDB
+
+					Timer1.Enabled = False
 
 					ModalitaEsecuzioneAutomatica = True
 					Call lstProcedure_DoubleClick(sender, e)

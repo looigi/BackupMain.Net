@@ -81,16 +81,13 @@
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNetZip, Version=1.13.4.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
-      <HintPath>..\packages\DotNetZip.1.13.4\lib\net40\DotNetZip.dll</HintPath>
-    </Reference>
     <Reference Include="Interop.JRO">
-      <HintPath>..\..\DLL-OperazioniSuFile\OperazioniSuFile\obj\Debug\Interop.JRO.dll</HintPath>
+      <HintPath>bin\Interop.JRO.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\AAA-ClassiUtili\Zip\Ionic.Zip.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\UtilitySorgenti\AAA-ClassiUtili.NET\Zip\Ionic.Zip.dll</HintPath>
     </Reference>
     <Reference Include="Logger">
       <HintPath>..\..\Log\LogCasareccio\bin\Debug\Logger.dll</HintPath>

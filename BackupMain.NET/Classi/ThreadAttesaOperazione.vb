@@ -16,9 +16,9 @@ Public Class ThreadAttesaOperazione
     Private lblOperazione As Label
     Private lblContatore As Label
     Private Operazione As String
-    Private zipFile As ZipFile
+	Private zipFile As ZipFile
 
-    Public Sub EsegueControllo(i As Form, id As Integer, modServ As Boolean, clLog As LogCasareccio.LogCasareccio.Logger, FileDaC As String, L As StringBuilder,
+	Public Sub EsegueControllo(i As Form, id As Integer, modServ As Boolean, clLog As LogCasareccio.LogCasareccio.Logger, FileDaC As String, L As StringBuilder,
                                lblOp As Label, lblCont As Label, Oper As String, Optional z As ZipFile = Nothing)
         instanceThread = i
         idProcThread = id
