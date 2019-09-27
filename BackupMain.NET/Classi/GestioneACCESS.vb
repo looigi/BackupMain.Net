@@ -66,11 +66,12 @@ Public Class GestioneACCESS
         ' Routine che apre il DB e vede se ci sono errori
         Dim Conn As Object = CreateObject("ADODB.Connection")
 
-        Try
-            Conn.Open(Connessione)
-            Conn.CommandTimeout = 0
-        Catch ex As Exception
-            If Not clLog Is Nothing Then
+		Try
+			Conn.Open(Connessione)
+			Conn.CommandTimeout = 0
+		Catch ex As Exception
+			'MsgBox(ex.Message)
+			If Not clLog Is Nothing Then
                 ScriveErrore(idProc, ex.Message, clLog)
             End If
         End Try

@@ -3,6 +3,7 @@ Imports System.IO
 Imports System.Text
 Imports BackupMain.NET.OperazioniSuFile
 Imports Ionic.Zip
+Imports OperazioniSuFile
 
 Module mdlGenerale
 	Public NotifyIcon1 As NotifyIcon = New NotifyIcon
@@ -137,10 +138,10 @@ Module mdlGenerale
 		Return Ritorno
 	End Function
 
-	Public Function EliminaFilesVecchi(instance As Form) As Integer
+	Public Function EliminaFilesVecchi(Instance As Form) As Integer
 		Dim Quanti As Integer = 0
 		Dim gf As New GestioneFilesDirectory
-		gf.ScansionaDirectorySingola("C:\BackupLog", instance)
+		gf.ScansionaDirectorySingola("C:\BackupLog", Instance)
 		Dim Filetti() As String = gf.RitornaFilesRilevati
 		Dim qFiletti As Integer = gf.RitornaQuantiFilesRilevati
 		Dim d As Date = Now
@@ -237,13 +238,13 @@ Module mdlGenerale
 		Return Ritorno
 	End Function
 
-    Public Function ControllaDischi(idProc As Integer, clLog As LogCasareccio.LogCasareccio.Logger, txtNomeProcedura As TextBox, lstOperazioni As ListBox) As Boolean
-        Dim Ok As Boolean = True
-        Dim Db As New GestioneACCESS
-        Dim ConnSQL As Object = CreateObject("ADODB.Connection")
+	Public Function ControllaDischi(idProc As Integer, clLog As LogCasareccio.LogCasareccio.Logger, txtNomeProcedura As TextBox, lstOperazioni As ListBox) As Boolean
+		Dim Ok As Boolean = True
+		Dim Db As New GestioneACCESS
+		Dim ConnSQL As Object = CreateObject("ADODB.Connection")
 
-        clLog.ScriveLogServizio("Controllo esistenza dischi: apertura db")
-        If Db.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
+		clLog.ScriveLogServizio("Controllo esistenza dischi: apertura db")
+		If Db.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
             ConnSQL = Db.ApreDB(idProc, clLog)
 
             Dim Rec(,) As String

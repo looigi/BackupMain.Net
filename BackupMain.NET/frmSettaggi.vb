@@ -5,8 +5,8 @@ Imports Ionic.Zip
 Public Class frmSettaggi
 
     Private Sub frmSettaggi_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
-        frmMain.Show()
-    End Sub
+		frmMain.Show()
+	End Sub
 
     Private Sub frmSettaggi_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim opFiles As New OperazioniSuFile

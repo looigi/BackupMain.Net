@@ -13,7 +13,8 @@
     <MyType>WindowsForms</MyType>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>D:\Looigi\VB.Net\Miei\Backup\Pubblicazione\Applicazione\</PublishUrl>
+    <TargetFrameworkProfile />
+    <PublishUrl>E:\Sorgenti\VB.Net\Miei\Form\Backup\BackupMain.Net\BackupMain.NET\Pubblicazione\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -23,12 +24,11 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationRevision>3</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -41,7 +41,7 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
@@ -82,12 +82,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Interop.JRO">
-      <HintPath>..\..\DLL-OperazioniSuFile\OperazioniSuFile\obj\Debug\Interop.JRO.dll</HintPath>
+      <HintPath>bin\Interop.JRO.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\AAA-ClassiUtili\Zip\Ionic.Zip.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\UtilitySorgenti\AAA-ClassiUtili.NET\Zip\Ionic.Zip.dll</HintPath>
     </Reference>
     <Reference Include="Logger">
       <HintPath>..\..\Log\LogCasareccio\bin\Debug\Logger.dll</HintPath>
@@ -117,8 +117,10 @@
     <Compile Include="Classi\GestioneFilesDirectory.vb" />
     <Compile Include="Classi\MapUnMapDrives.vb" />
     <Compile Include="Classi\mdlOpFile.vb" />
+    <Compile Include="Classi\OperazioniDaEseguire.vb" />
     <Compile Include="Classi\OperazioniSuFile.vb" />
     <Compile Include="Classi\OperazioniSuFileDettagli.vb" />
+    <Compile Include="Classi\RoutineVarie.vb" />
     <Compile Include="Classi\SQLSERVER.vb" />
     <Compile Include="Classi\ThreadAttesaOperazione.vb" />
     <Compile Include="Classi\GestioneMAIL.vb" />
@@ -134,11 +136,10 @@
     <Compile Include="frmEsecuzione.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMain.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmMain.Designer.vb">
       <DependentUpon>frmMain.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmMain.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmProcedura.Designer.vb">
@@ -210,6 +211,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Immagini\CD.jpg">
