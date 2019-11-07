@@ -98,7 +98,8 @@ Public Class frmEsecuzione
 				Catch ex As Exception
 
 				End Try
-				'NotifyIcon1.Visible = False
+
+				NotifyIcon1.Visible = False
 
 				End
 			Else

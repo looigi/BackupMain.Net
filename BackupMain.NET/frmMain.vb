@@ -114,7 +114,7 @@ Public Class frmMain
 		Else
 			gf.CreaDirectoryDaPercorso("C:\BackupLog\Config\")
 			gf.ApreFileDiTestoPerScrittura("C:\BackupLog\Config\Config.dat")
-			Config = Application.StartupPath & "\BackupMain.NET.exe;looigi@gmail.com;pippuzzetto227!;"
+			Config = Application.StartupPath & "\BackupMain.NET.exe;looigi@gmail.com;Piripacchio227!;"
 			gf.ScriveTestoSuFileAperto(Config)
 			gf.ChiudeFileDiTestoDopoScrittura()
 		End If
