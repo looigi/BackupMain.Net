@@ -241,13 +241,13 @@ Module mdlGenerale
 	Public Function ControllaDischi(idProc As Integer, clLog As LogCasareccio.LogCasareccio.Logger, txtNomeProcedura As TextBox, lstOperazioni As ListBox) As Boolean
 		Dim Ok As Boolean = True
 		Dim Db As New GestioneACCESS
-		Dim ConnSQL As Object = CreateObject("ADODB.Connection")
+		Dim ConnSQL As New ADODB.Connection
 
 		clLog.ScriveLogServizio("Controllo esistenza dischi: apertura db")
 		If Db.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-            ConnSQL = Db.ApreDB(idProc, clLog)
+			Db.ApreDB(idProc, clLog)
 
-            Dim Rec(,) As String
+			Dim Rec(,) As String
             Dim opFile As New OperazioniSuFile
             clLog.ScriveLogServizio("Controllo esistenza dischi: caricamento righe procedura")
             idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, txtNomeProcedura.Text, lstOperazioni, clLog)
@@ -370,8 +370,8 @@ Module mdlGenerale
 
             opFile = Nothing
 
-            Db.ChiudeDB(True, ConnSQL)
-        End If
+			Db.ChiudeDB(True)
+		End If
         clLog.ScriveLogServizio("Controllo esistenza dischi: " & Ok)
 
         Return Ok

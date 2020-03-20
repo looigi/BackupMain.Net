@@ -5,14 +5,14 @@
         Dim CopiateTabelle As Boolean = False
 
         If DBSQLCE.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB", 2) = True Then
-            Dim ConnSQLCE As Object = DBSQLCE.ApreDB(0, clLog)
-            Dim Rec As Object = CreateObject("ADODB.Recordset")
-            Dim Sql As String = ""
+			DBSQLCE.ApreDB(0, clLog)
+			Dim Rec As New ADODB.Recordset
+			Dim Sql As String = ""
 
             If DBAccess.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB", 1) = True Then
-                Dim ConnAccess As Object = DBAccess.ApreDB(0, clLog)
+				DBAccess.ApreDB(0, clLog)
 
-                If Not CopiateTabelle Then
+				If Not CopiateTabelle Then
                     Dim NomiTabelle() As String = {"DettaglioProcedure", "FileDestinazioneIntelligente", "FilesDestinazione", "NomiProcedure", "Schedulazioni"}
                     Dim Campi() As Integer = {13, 5, 2, 6, 3}
                     Dim Riga As Long
@@ -21,20 +21,20 @@
                         Riga = 0
 
                         Sql = "Delete From " & NomiTabelle(i)
-                        DBAccess.EsegueSql(0, ConnAccess, Sql, clLog)
+						DBAccess.EsegueSql(0, Sql, clLog)
 
-                        Sql = "Select * From " & NomiTabelle(i)
-                        Rec = DBSQLCE.LeggeQuery(0, ConnSQLCE, Sql, clLog)
-                        Do Until Rec.Eof
-                            Sql = "Insert Into " & NomiTabelle(i) & " Values ("
-                            For k As Integer = 0 To Campi(i)
-                                Sql &= "'" & Rec(k).Value.ToString.Replace("'", "''") & "', "
-                            Next
-                            Sql = Mid(Sql, 1, Sql.Length - 2)
-                            Sql &= ")"
-                            DBAccess.EsegueSql(0, ConnAccess, Sql, clLog)
+						Sql = "Select * From " & NomiTabelle(i)
+						Rec = DBSQLCE.LeggeQuery(0, Sql, clLog)
+						Do Until Rec.Eof
+							Sql = "Insert Into " & NomiTabelle(i) & " Values ("
+							For k As Integer = 0 To Campi(i)
+								Sql &= "'" & Rec(k).Value.ToString.Replace("'", "''") & "', "
+							Next
+							Sql = Mid(Sql, 1, Sql.Length - 2)
+							Sql &= ")"
+							DBAccess.EsegueSql(0, Sql, clLog)
 
-                            Riga += 1
+							Riga += 1
                             If Riga / 50 = Int(Riga / 50) Then
                                 frmMain.lblTitolo.Text = NomiTabelle(i) & ": " & Riga
                                 Application.DoEvents()

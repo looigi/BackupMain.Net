@@ -34,8 +34,8 @@ Public Class GestioneFilesDirectory
     Private DimensioniArrayAttualeDir As Long
     Private DimensioniArrayAttualeFiles As Long
 
-    Private RefreshLabel As Integer = 100
-    Private Conta As Integer
+	Private RefreshLabel As Integer = 5
+	Private Conta As Integer
 
     Private Declare Function WNetGetConnection Lib "mpr.dll" Alias _
              "WNetGetConnectionA" (ByVal lpszLocalName As String,

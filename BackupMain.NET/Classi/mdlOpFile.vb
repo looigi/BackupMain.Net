@@ -230,7 +230,7 @@ Module mdlOpFile
     End Sub
 
     Private Sub PrendeMaxLog(idproc As Integer)
-        'Dim Rec As Object = CreateObject("ADODB.Recordset")
+        'Dim Rec As new ADODB.Recordset
         'Dim Sql As String
         'Dim Cont As Long
 
@@ -262,7 +262,7 @@ Module mdlOpFile
         '        End If
         '    End If
 
-        '    Dim Rec As Object = CreateObject("ADODB.Recordset")
+        '    Dim Rec As new ADODB.Recordset
         '    Dim Sql As String
 
         '    If ContatoreLog = -1 Then

@@ -78,10 +78,10 @@ Public Class frmEsecuzione
 		'Dim DB As New GestioneACCESS
 
 		'If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp , "ConnDB") = True Then
-		'    Dim ConnSQL As Object = DB.ApreDB(idProc)
+		'    Db.ApreDB(idProc)
 		'    Dim Sql As String = "Delete From LogOperazioni Where idProc=" & idProc
 
-		'    DB.EsegueSql(idProc, ConnSQL, Sql)
+		'    DB.EsegueSql(idProc, Sql)
 		'    DB.ChiudeDB(True, ConnSQL)
 		'End If
 

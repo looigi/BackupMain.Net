@@ -7,102 +7,102 @@ Public Class SQLSERVER
     Private ModalitaLocale As Boolean = True
 
     Public Function ProvaConnessione(Connessione As String) As String
-        Dim Conn As Object = CreateObject("ADODB.Connection")
+		Dim Conn As New ADODB.Connection
 
-        Try
-            Conn.Open(Connessione)
-            Conn.Close()
+		Try
+			Conn.Open(Connessione)
+			Conn.Close()
 
-            Conn = Nothing
-            Return ""
-        Catch ex As Exception
-            'Dim H As HttpApplication = HttpContext.Current.ApplicationInstance
-            'Dim StringaPassaggio As String
+			Conn = Nothing
+			Return ""
+		Catch ex As Exception
+			'Dim H As HttpApplication = HttpContext.Current.ApplicationInstance
+			'Dim StringaPassaggio As String
 
-            'StringaPassaggio = "?Errore=Apertura DB"
-            'StringaPassaggio = StringaPassaggio & "&Utente=" & H.Session("idUtente")
-            'StringaPassaggio = StringaPassaggio & "&Chiamante=" & H.Request.CurrentExecutionFilePath.ToUpper.Trim
-            'StringaPassaggio = StringaPassaggio & "&Errore=" & ex.Message
-            'H.Response.Redirect("Errore.aspx" & StringaPassaggio)
+			'StringaPassaggio = "?Errore=Apertura DB"
+			'StringaPassaggio = StringaPassaggio & "&Utente=" & H.Session("idUtente")
+			'StringaPassaggio = StringaPassaggio & "&Chiamante=" & H.Request.CurrentExecutionFilePath.ToUpper.Trim
+			'StringaPassaggio = StringaPassaggio & "&Errore=" & ex.Message
+			'H.Response.Redirect("Errore.aspx" & StringaPassaggio)
 
-            Return ex.Message
-        End Try
-    End Function
+			Return ex.Message
+		End Try
+	End Function
 
-    Public Function ImpostaConnessioneDirettamente(Connessione As String) As Boolean
-        Dim Conn As String = Connessione
-        Dim Ok As Boolean = True
-        Dim Ritorno As String
+	Public Function ImpostaConnessioneDirettamente(Connessione As String) As Boolean
+		Dim Conn As String = Connessione
+		Dim Ok As Boolean = True
+		Dim Ritorno As String
 
-        If Conn = "" Then
-            ' Response.Redirect("errore_ErroreImprevisto.aspx?Errore=Impostazioni di connessione al DB non valide&Chiamante=" & Request.CurrentExecutionFilePath.ToUpper.Trim & "&Sql=")
-            Ok = False
-        Else
-            Ritorno = ProvaConnessione(Conn)
-            If Ritorno <> "" Then
-                ' Response.Redirect("errore_ErroreImprevisto.aspx?Errore=" & Ritorno & "&Chiamante=" & Request.CurrentExecutionFilePath.ToUpper.Trim & "&Sql=")
-                Ok = False
-            Else
-                ConnessioneSQL = Conn
-            End If
-            ' Impostazioni di base
-        End If
+		If Conn = "" Then
+			' Response.Redirect("errore_ErroreImprevisto.aspx?Errore=Impostazioni di connessione al DB non valide&Chiamante=" & Request.CurrentExecutionFilePath.ToUpper.Trim & "&Sql=")
+			Ok = False
+		Else
+			Ritorno = ProvaConnessione(Conn)
+			If Ritorno <> "" Then
+				' Response.Redirect("errore_ErroreImprevisto.aspx?Errore=" & Ritorno & "&Chiamante=" & Request.CurrentExecutionFilePath.ToUpper.Trim & "&Sql=")
+				Ok = False
+			Else
+				ConnessioneSQL = Conn
+			End If
+			' Impostazioni di base
+		End If
 
-        Return Ok
-    End Function
+		Return Ok
+	End Function
 
-    Public Function LeggeImpostazioniDiBase() As Boolean
-        'Dim Ritorno As String
-        'Dim Ok As Boolean = True
-        'Dim CosaCercare As String
-        'Dim Conn As String = ""
+	Public Function LeggeImpostazioniDiBase() As Boolean
+		'Dim Ritorno As String
+		'Dim Ok As Boolean = True
+		'Dim CosaCercare As String
+		'Dim Conn As String = ""
 
-        'If ModalitaLocale = True Then
-        '    CosaCercare = "SQLConnectionStringLOCALE"
-        'Else
-        '    CosaCercare = "SQLConnectionStringWEB"
-        'End If
+		'If ModalitaLocale = True Then
+		'    CosaCercare = "SQLConnectionStringLOCALE"
+		'Else
+		'    CosaCercare = "SQLConnectionStringWEB"
+		'End If
 
-        '' Impostazioni di base
-        'Dim ListaConnessioni As ConnectionStringSettingsCollection = ConfigurationManager.ConnectionStrings
+		'' Impostazioni di base
+		'Dim ListaConnessioni As ConnectionStringSettingsCollection = ConfigurationManager.ConnectionStrings
 
-        'If ListaConnessioni.Count <> 0 Then
-        '    ' Get the collection elements. 
-        '    For Each Connessioni As ConnectionStringSettings In ListaConnessioni
-        '        Dim Nome As String = Connessioni.Name
-        '        Dim Provider As String = Connessioni.ProviderName
-        '        Dim connectionString As String = Connessioni.ConnectionString
+		'If ListaConnessioni.Count <> 0 Then
+		'    ' Get the collection elements. 
+		'    For Each Connessioni As ConnectionStringSettings In ListaConnessioni
+		'        Dim Nome As String = Connessioni.Name
+		'        Dim Provider As String = Connessioni.ProviderName
+		'        Dim connectionString As String = Connessioni.ConnectionString
 
-        '        If Nome = CosaCercare Then
-        '            Conn = "Provider=" & Provider & ";" & connectionString
+		'        If Nome = CosaCercare Then
+		'            Conn = "Provider=" & Provider & ";" & connectionString
 
-        '            Exit For
-        '        End If
-        '    Next
-        'End If
+		'            Exit For
+		'        End If
+		'    Next
+		'End If
 
-        'If Conn = "" Then
-        '    ' Response.Redirect("errore_ErroreImprevisto.aspx?Errore=Impostazioni di connessione al DB non valide&Chiamante=" & Request.CurrentExecutionFilePath.ToUpper.Trim & "&Sql=")
-        '    Ok = False
-        'Else
-        '    Ritorno = ProvaConnessione(Conn)
-        '    If Ritorno <> "" Then
-        '        ' Response.Redirect("errore_ErroreImprevisto.aspx?Errore=" & Ritorno & "&Chiamante=" & Request.CurrentExecutionFilePath.ToUpper.Trim & "&Sql=")
-        '        Ok = False
-        '    Else
-        '        ConnessioneSQL = Conn
-        '    End If
-        '    ' Impostazioni di base
-        'End If
+		'If Conn = "" Then
+		'    ' Response.Redirect("errore_ErroreImprevisto.aspx?Errore=Impostazioni di connessione al DB non valide&Chiamante=" & Request.CurrentExecutionFilePath.ToUpper.Trim & "&Sql=")
+		'    Ok = False
+		'Else
+		'    Ritorno = ProvaConnessione(Conn)
+		'    If Ritorno <> "" Then
+		'        ' Response.Redirect("errore_ErroreImprevisto.aspx?Errore=" & Ritorno & "&Chiamante=" & Request.CurrentExecutionFilePath.ToUpper.Trim & "&Sql=")
+		'        Ok = False
+		'    Else
+		'        ConnessioneSQL = Conn
+		'    End If
+		'    ' Impostazioni di base
+		'End If
 
-        'Return Ok
-    End Function
+		'Return Ok
+	End Function
 
-    Public Function ApreDB() As Object
-        ' Routine che apre il DB e vede se ci sono errori
-        Dim Conn As Object = CreateObject("ADODB.Connection")
+	Public Function ApreDB() As Object
+		' Routine che apre il DB e vede se ci sono errori
+		Dim Conn As New ADODB.Connection
 
-        Try
+		Try
             Conn.Open(ConnessioneSQL)
             Conn.CommandTimeout = 0
         Catch ex As Exception
@@ -174,7 +174,7 @@ Public Class SQLSERVER
 
     Public Function LeggeQuery(ByVal Conn As Object, ByVal Sql As String) As Object
         Dim AperturaManuale As Boolean = ControllaAperturaConnessione(Conn)
-        Dim Rec As Object = CreateObject("ADODB.Recordset")
+        Dim Rec As new ADODB.Recordset
 
         Try
             Rec.Open(Sql, Conn)
@@ -198,7 +198,7 @@ Public Class SQLSERVER
 
     Public Function LeggeQuerySenzaTRY(ByVal Conn As Object, ByVal Sql As String) As Object
         Dim AperturaManuale As Boolean = ControllaAperturaConnessione(Conn)
-        Dim Rec As Object = CreateObject("ADODB.Recordset")
+        Dim Rec As new ADODB.Recordset
 
         Rec.Open(Sql, Conn)
 
@@ -209,7 +209,7 @@ Public Class SQLSERVER
 
     Public Function ControlloEsistenzaTabella(Conn As Object, NomeTabella As String) As Boolean
         Dim Ritorno As Boolean
-        Dim Rec As Object = CreateObject("ADODB.Recordset")
+        Dim Rec As new ADODB.Recordset
         Dim Sql As String
         Dim AperturaManuale As Boolean = ControllaAperturaConnessione(Conn)
         
@@ -249,7 +249,7 @@ Public Class SQLSERVER
     End Function
 
     Public Function PrendeChiaviTabella(ConnSql As Object, NomeTabella As String) As String
-        Dim Rec As Object = CreateObject("ADODB.Recordset")
+        Dim Rec As new ADODB.Recordset
         Dim Sql As String = "select COLUMN_NAME from information_schema.KEY_COLUMN_USAGE   where table_name = '" & NomeTabella & "' Order By ORDINAL_POSITION "
         Dim Ritorno As String = ""
 

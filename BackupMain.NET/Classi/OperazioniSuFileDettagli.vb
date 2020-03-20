@@ -328,9 +328,9 @@ Public Class OperazioniSuFileDettagli
 		Dim ConnSQL As Object = Nothing
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-			ConnSQL = DB.ApreDB(idProc, clLog)
+			DB.ApreDB(idProc, clLog)
 
-			Dim Rec2 As Object = CreateObject("ADODB.Recordset")
+			Dim Rec2 As New ADODB.Recordset
 			Dim Sql As String
 			Dim CartelleDest() As String = {}
 			Dim qCartelleDest As Integer
@@ -360,13 +360,13 @@ Public Class OperazioniSuFileDettagli
 			Dim EsegueLettura As Boolean
 
 			' Lettura origine
-			If Origine <> CampiUltimeOperazioni(1) Then
-				EsegueLettura = True
-				ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Lettura directory di origine " & vbCrLf & Origine, " ", ModalitaServizio, clLog)
-			Else
-				EsegueLettura = False
-				ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Directory di origine " & vbCrLf & Origine & " già letta", " ", ModalitaServizio, clLog)
-			End If
+			'If Origine <> CampiUltimeOperazioni(1) Then
+			EsegueLettura = True
+			ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Lettura directory di origine " & vbCrLf & Origine, " ", ModalitaServizio, clLog)
+			'Else
+			'	EsegueLettura = False
+			'	ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Directory di origine " & vbCrLf & Origine & " già letta", " ", ModalitaServizio, clLog)
+			'End If
 
 			If MetteInPausa Then
 				MetteInPausaLaRoutine()
@@ -391,13 +391,13 @@ Public Class OperazioniSuFileDettagli
 					qCartelleOrig = GF.RitornaQuanteDirectoryRilevate
 
 					Sql = "Delete * From UltimeDirOrig"
-					DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+					DB.EsegueSql(idProc, Sql, clLog)
 
 					For i As Integer = 1 To qCartelleOrig
 						Dim dire As String = CartelleOrig(i).Replace(Origine, "").Replace("'", "''").Trim
 						If dire <> "" Then
 							Sql = "Insert Into UltimeDirOrig Values ('" & dire & "')"
-							DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+							DB.EsegueSql(idProc, Sql, clLog)
 						End If
 					Next
 				End If
@@ -407,8 +407,8 @@ Public Class OperazioniSuFileDettagli
 				SkippataOrigine = True
 
 				Sql = "Select * From UltimeDirOrig"
-				Rec2 = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
-				Do Until Rec2.eof
+				Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
+				Do Until Rec2.EOF
 					Dim Dire As String = ("" & Rec2("Dir").Value).Trim
 
 					If Dire <> "" Then
@@ -422,9 +422,9 @@ Public Class OperazioniSuFileDettagli
 						qCartelleOrig += 1
 					End If
 
-					Rec2.MoveNext
+					Rec2.MoveNext()
 				Loop
-				Rec2.Close
+				Rec2.Close()
 			End If
 
 			If MetteInPausa Then
@@ -434,7 +434,7 @@ Public Class OperazioniSuFileDettagli
 			If Not BloccaTutto Then
 				If EsegueLettura Then
 					Sql = "Delete * From FilesOrigine"
-					DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+					DB.EsegueSql(idProc, Sql, clLog)
 
 					ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Scrittura dati directory" & vbCrLf & Origine, " ", ModalitaServizio, clLog)
 					ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Numero Cartelle: " & GF.FormattaNumero(qCartelleOrig, False) & vbCrLf & "Numero files: " & GF.FormattaNumero(qFiletti, False), " ", ModalitaServizio, clLog)
@@ -445,6 +445,7 @@ Public Class OperazioniSuFileDettagli
 						Altro = "\"
 					End If
 
+					Sql = ""
 					For i As Long = 0 To qFiletti
 						If Filetti(i) <> "" Then
 							Try
@@ -454,21 +455,26 @@ Public Class OperazioniSuFileDettagli
 								DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
 							End Try
 
-							Sql = "Insert Into FilesOrigine Values (" &
-								"'" & Filetti(i).Replace("'", "''").Replace(Origine & Altro, "") & "', " &
-								" " & DimensioneFiletti(i) & ", " &
-								"'" & DatellaFile & "' " &
-								")"
-							DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+							Sql &= "Select " &
+								"'" & Filetti(i).Replace("'", "''").Replace(Origine & Altro, "") & "' As File, " &
+								" " & DimensioneFiletti(i) & " As Dimensioni, " &
+								"'" & DatellaFile & "' As Dataora From VersioneDB " &
+								" Union All "
+							' DB.EsegueSql(idProc, Sql, clLog)
 
 							If IsNothing(lblContatore) = False Then
-								If i / 100 = Int(i / 100) Then
+								If i / 20 = Int(i / 20) Then
 									'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
 									If instance.InvokeRequired Then
 										instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
 									Else
 										lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
 									End If
+
+									Sql = Mid(Sql, 1, Sql.Length - 11)
+									Sql = "Insert Into FilesOrigine Select * From (" & Sql & ") As AA"
+									DB.EsegueSql(idProc, Sql, clLog)
+									Sql = ""
 								End If
 							End If
 
@@ -483,6 +489,12 @@ Public Class OperazioniSuFileDettagli
 							Application.DoEvents()
 						End If
 					Next
+					If Sql <> "" Then
+						Sql = Mid(Sql, 1, Sql.Length - 11)
+						Sql = "Insert Into FilesOrigine Select * From (" & Sql & ") As AA"
+						DB.EsegueSql(idProc, Sql, clLog)
+						Sql = ""
+					End If
 
 					If IsNothing(lblContatore) = False Then
 						'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
@@ -511,7 +523,7 @@ Public Class OperazioniSuFileDettagli
 						LeggiFiles = False
 
 						Sql = "Select Max(Progressivo)+1 From FileDestinazioneIntelligente Where idProc=" & idProc & " And Operazione=" & Progressivo
-						Rec2 = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
+						Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
 						If Rec2(0).Value Is DBNull.Value = True Then
 							Massimo = 1
 						Else
@@ -522,7 +534,7 @@ Public Class OperazioniSuFileDettagli
 						ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Progressivo Destinazione: " & GF.FormattaNumero(Massimo, False), " ", ModalitaServizio, clLog)
 
 						Sql = "Select Count(*) From FileDestinazioneIntelligente Where idProc=" & idProc & " And Operazione=" & Progressivo
-						Rec2 = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
+						Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
 						If Rec2(0).Value Is DBNull.Value = True Then
 							ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Rilevato nessun file", " ", ModalitaServizio, clLog)
 
@@ -569,11 +581,11 @@ Public Class OperazioniSuFileDettagli
 								qCartelleDest = GF.RitornaQuanteDirectoryRilevate
 
 								'Sql = "Delete * From UltimeDirDestin"
-								'DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+								'DB.EsegueSql(idProc, Sql, clLog)
 
 								'For i As Integer = 1 To qCartelleDest
 								'	Sql = "Insert Into UltimeDirDestin Values ('" & CartelleDest(i).Replace(Destinazione & "\", "").Replace("'", "''") & "')"
-								'	DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+								'	DB.EsegueSql(idProc, Sql, clLog)
 								'Next
 
 								'If Intelligente Then
@@ -581,7 +593,7 @@ Public Class OperazioniSuFileDettagli
 								'Else
 								Sql = "Delete * From FilesDestinazione"
 								' End If
-								DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+								DB.EsegueSql(idProc, Sql, clLog)
 
 								ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Scrittura dati directory" & vbCrLf & GF.TagliaLunghezzaScritta(Destinazione, LunghezzaMassimaScritte), " ", ModalitaServizio, clLog)
 								ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Numero Cartelle: " & GF.FormattaNumero(qCartelleDest, False) & vbCrLf & "Numero files: " & GF.FormattaNumero(qFiletti, False), " ", ModalitaServizio, clLog)
@@ -592,6 +604,7 @@ Public Class OperazioniSuFileDettagli
 									Altro = "\"
 								End If
 
+								Sql = ""
 								For i As Long = 0 To qFiletti
 									If Filetti(i) <> "" Then
 										Try
@@ -610,23 +623,36 @@ Public Class OperazioniSuFileDettagli
 												" " & DimensioneFiletti(i) & ", " &
 												"'" & DatellaFile & "' " &
 												")"
+											DB.EsegueSql(idProc, Sql, clLog)
 										Else
-											Sql = "Insert Into FilesDestinazione Values (" &
-												"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "', " &
-												" " & DimensioneFiletti(i) & ", " &
-												"'" & DatellaFile & "' " &
-												")"
+											Sql &= "Select " &
+												"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "' As File, " &
+												" " & DimensioneFiletti(i) & " As Dimensioni, " &
+												"'" & DatellaFile & "' As DataOra From VersioneDB " &
+												" Union All "
+
+											'Sql = "Insert Into FilesDestinazione Values (" &
+											'	"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "', " &
+											'	" " & DimensioneFiletti(i) & ", " &
+											'	"'" & DatellaFile & "' " &
+											'	")"
 										End If
-										DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
 										Massimo = i + 1
 
 										If IsNothing(lblContatore) = False Then
-											If i / 100 = Int(i / 100) Then
+											If i / 20 = Int(i / 20) Then
 												'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
 												If instance.InvokeRequired Then
 													instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
 												Else
 													lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
+												End If
+
+												If Not Intelligente Then
+													Sql = Mid(Sql, 1, Sql.Length - 11)
+													Sql = "Insert Into FilesDestinazione Select * From (" & Sql & ") As AA"
+													DB.EsegueSql(idProc, Sql, clLog)
+													Sql = ""
 												End If
 											End If
 										End If
@@ -642,6 +668,12 @@ Public Class OperazioniSuFileDettagli
 										Application.DoEvents()
 									End If
 								Next
+								If Not Intelligente And Sql <> "" Then
+									Sql = Mid(Sql, 1, Sql.Length - 11)
+									Sql = "Insert Into FilesDestinazione Select * From (" & Sql & ") As AA"
+									DB.EsegueSql(idProc, Sql, clLog)
+									Sql = ""
+								End If
 
 								If IsNothing(lblContatore) = False Then
 									'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
@@ -658,7 +690,7 @@ Public Class OperazioniSuFileDettagli
 							'	SkippataDestinazione = True
 
 							'	Sql = "Select * From UltimeDirDestin"
-							'	Rec2 = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
+							'	Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
 							'	Do Until Rec2.eof
 							'		Dim Dire As String = GF.TornaNomeDirectoryDaPath(Rec2("Dir").Value)
 
@@ -691,11 +723,11 @@ Public Class OperazioniSuFileDettagli
 						If Intelligente Then
 							ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Pulizia valori per sincronizzazione intelligente", " ", ModalitaServizio, clLog)
 							Sql = "Delete * From DatiSincroniaIntelligente"
-							DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+							DB.EsegueSql(idProc, Sql, clLog)
 
 							ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Copia valori per sincronizzazione intelligente", " ", ModalitaServizio, clLog)
 							Sql = "Insert Into DatiSincroniaIntelligente Select * From FileDestinazioneIntelligente Where idProc=" & idProc & " And Operazione=" & Progressivo
-							DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+							DB.EsegueSql(idProc, Sql, clLog)
 						End If
 					End If
 
@@ -718,10 +750,10 @@ Public Class OperazioniSuFileDettagli
 							clLog.ScriveLogServizio("SQL: " & Sql)
 						End If
 
-						Rec2 = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
+						Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
 						FilesDaElaborare = New Collection
 						q = 0
-						Do Until Rec2.Eof
+						Do Until Rec2.EOF
 							If Not lblContatore Is Nothing Then
 								If q / 10 = Int(q / 10) Then
 									'lblContatore.Text = gf.FormattaNumero(q, False)
@@ -764,11 +796,11 @@ Public Class OperazioniSuFileDettagli
 							Dim QuantiTotali As Long = 0
 
 							Sql = "Select Count(*) From FilesDestinazione"
-							Rec2 = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
+							Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
 							If Not Rec2(0).Value Is DBNull.Value Then
 								QuantiTotali = Rec2(0).Value
 							End If
-							Rec2.Close
+							Rec2.Close()
 
 							Dim TotaleFiles As Long = QuantiTotali * 75 / 100
 
@@ -790,7 +822,7 @@ Public Class OperazioniSuFileDettagli
 												"[File]='" & FileOrigine.Replace(Origine & "\", "").Replace("'", "''") & "' And " &
 												"idProc=" & idProc & " And " &
 												"Operazione=" & Progressivo
-											DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+											DB.EsegueSql(idProc, Sql, clLog)
 										End If
 
 										ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Eliminazione file:" & vbCrLf & GF.TagliaLunghezzaScritta(FilesDaElaborare.Item(i), LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
@@ -833,10 +865,10 @@ Public Class OperazioniSuFileDettagli
 								clLog.ScriveLogServizio("SQL: " & Sql)
 							End If
 
-							Rec2 = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
+							Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
 							FilesDaElaborare = New Collection
 							q = 0
-							Do Until Rec2.Eof
+							Do Until Rec2.EOF
 								If Not lblContatore Is Nothing Then
 									If q / 10 = Int(q / 10) Then
 										'lblContatore.Text = gf.FormattaNumero(q, False)
@@ -908,7 +940,7 @@ Public Class OperazioniSuFileDettagli
 													" " & FileLen(FileOrigine) & ", " &
 													"'" & DatellaFile & "' " &
 													")"
-												DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+												DB.EsegueSql(idProc, Sql, clLog)
 											End If
 
 											Try
@@ -955,76 +987,98 @@ Public Class OperazioniSuFileDettagli
 								' Elimina/Crea cartelle vuote nella destinazione
 								ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Pulizia tabella appoggio origine", "", ModalitaServizio, clLog)
 								Sql = "Delete From DirectOrig"
-								DB.EsegueSqlSenzaTRY(idProc, ConnSQL, Sql, clLog)
+								DB.EsegueSqlSenzaTRY(idProc, Sql, clLog)
 
 								Dim i As Long = 0
 
+								Sql = ""
 								For Each cd As String In CartelleOrig
 									If cd <> "" Then
-										If i / 100 = Int(i / 100) Then
+										If i / 20 = Int(i / 20) Then
 											ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Scrittura tabella origine", i & "/" & qCartelleOrig, ModalitaServizio, clLog)
+											Sql = Mid(Sql, 1, Sql.Length - 11)
+											Sql = "Insert Into DirectOrig Select * From (" & Sql & ") As AA"
+											DB.EsegueSql(idProc, Sql, clLog)
+											Sql = ""
 										End If
 										cd = cd.Replace(Origine, "")
 										If cd <> "" Then
 											cd = cd.Replace("\\", "\")
-											Sql = "Insert Into DirectOrig Values ('" & cd.Replace("'", "''") & "')"
-											DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+											Sql &= "Select " &
+												"'" & cd.Replace("'", "''") & "' As Nome From VersioneDB " &
+												" Union All "
 										End If
 									End If
 									i += 1
 								Next
+								If Sql <> "" Then
+									Sql = Mid(Sql, 1, Sql.Length - 11)
+									Sql = "Insert Into DirectOrig Select * From (" & Sql & ") As AA"
+									DB.EsegueSql(idProc, Sql, clLog)
+								End If
 
 								ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Pulizia tabella appoggio destinazione", "", ModalitaServizio, clLog)
 								Sql = "Delete From DirectDest"
-								DB.EsegueSqlSenzaTRY(idProc, ConnSQL, Sql, clLog)
+								DB.EsegueSqlSenzaTRY(idProc, Sql, clLog)
 
 								i = 0
+								Sql = ""
 								For Each cd As String In CartelleDest
 									If cd <> "" Then
-										If i / 100 = Int(i / 100) Then
+										If i / 20 = Int(i / 20) Then
 											ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Scrittura tabella destin.", i & "/" & qCartelleDest, ModalitaServizio, clLog)
+											Sql = Mid(Sql, 1, Sql.Length - 11)
+											Sql = "Insert Into DirectDest Select * From (" & Sql & ") As AA"
+											DB.EsegueSql(idProc, Sql, clLog)
+											Sql = ""
 										End If
 										cd = cd.Replace(Destinazione, "")
 										If cd <> "" Then
 											cd = cd.Replace("\\", "\")
-											Sql = "Insert Into DirectDest Values ('" & cd.Replace("'", "''") & "')"
-											DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+											Sql &= "Select " &
+												"'" & cd.Replace("'", "''") & "' As Nome From VersioneDB " &
+												" Union All "
 										End If
 									End If
 									i += 1
 								Next
+								If Sql <> "" Then
+									Sql = Mid(Sql, 1, Sql.Length - 11)
+									Sql = "Insert Into DirectDest Select * From (" & Sql & ") As AA"
+									DB.EsegueSql(idProc, Sql, clLog)
+								End If
 
 								ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Lettura directory da eliminare", "", ModalitaServizio, clLog)
 								Sql = "Select * From DirectDest Where Nome Not In (Select Nome From DirectOrig)"
-								Rec2 = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
+								Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
 								Dim CartelleDaEliminare As New ArrayList
 								i = 0
-								Do Until Rec2.Eof
+								Do Until Rec2.EOF
 									If i / 100 = Int(i / 100) Then
 										ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Eliminazione tabella" & GF.TagliaLunghezzaScritta(Destinazione & Rec2("Nome").Value, LunghezzaMassimaScritte), i & "/" & CartelleDaEliminare.Count, ModalitaServizio, clLog)
 									End If
 									i += 1
 									CartelleDaEliminare.Add(Destinazione & Rec2("Nome").Value)
 
-									Rec2.MoveNext
+									Rec2.MoveNext()
 								Loop
-								Rec2.Close
+								Rec2.Close()
 
 								ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Lettura directory da creare", "", ModalitaServizio, clLog)
 								Sql = "Select * From DirectOrig Where Nome Not In (Select Nome From DirectDest)"
-								Rec2 = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
+								Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
 								Dim CartelleDaAggiungere As New ArrayList
 								i = 0
-								Do Until Rec2.Eof
+								Do Until Rec2.EOF
 									If i / 100 = Int(i / 100) Then
 										ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Creazione tabella" & GF.TagliaLunghezzaScritta(Destinazione & Rec2("Nome").Value, LunghezzaMassimaScritte), i & "/" & CartelleDaEliminare.Count, ModalitaServizio, clLog)
 									End If
 									i += 1
 									CartelleDaAggiungere.Add(Destinazione & Rec2("Nome").Value)
 
-									Rec2.MoveNext
+									Rec2.MoveNext()
 								Loop
-								Rec2.Close
+								Rec2.Close()
 
 								i = 0
 								Dim qc As Long = CartelleDaEliminare.Count
@@ -1065,7 +1119,7 @@ Public Class OperazioniSuFileDettagli
 										' Pulizia tabelle di appoggio e compattazione DB
 										If Intelligente Then
 											AggiornataTabellaIntelligente = True
-											AggiornaTabellaIntelligente(instance, idProc, Progressivo, DB, ConnSQL, lblOperazione, lblContatore, ModalitaServizio, clLog)
+											AggiornaTabellaIntelligente(instance, idProc, Progressivo, DB, lblOperazione, lblContatore, ModalitaServizio, clLog)
 										Else
 											If MetteInPausa Then
 												MetteInPausaLaRoutine()
@@ -1075,13 +1129,13 @@ Public Class OperazioniSuFileDettagli
 												ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Pulizia tabelle", " ", ModalitaServizio, clLog)
 
 												'Sql = "Delete * From FilesOrigine"
-												'DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+												'DB.EsegueSql(idProc, Sql, clLog)
 
 												'Sql = "Delete * From FilesDestinazione"
-												'DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+												'DB.EsegueSql(idProc, Sql, clLog)
 
 												Sql = "Delete * From DatiSincroniaIntelligente"
-												DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+												DB.EsegueSql(idProc, Sql, clLog)
 											End If
 										End If
 
@@ -1113,10 +1167,10 @@ Public Class OperazioniSuFileDettagli
 							clLog.ScriveLogServizio("SQL: " & Sql)
 						End If
 
-						Rec2 = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
+						Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
 						FilesDaElaborare = New Collection
 						q = 0
-						Do Until Rec2.Eof
+						Do Until Rec2.EOF
 							If Not lblContatore Is Nothing Then
 								If q / 10 = Int(q / 10) Then
 									'lblContatore.Text = gf.FormattaNumero(q, False)
@@ -1183,7 +1237,7 @@ Public Class OperazioniSuFileDettagli
 												" " & FileLen(FileOrigine) & ", " &
 												"'" & DatellaFile & "' " &
 												")"
-											DB.EsegueSql(idProc, ConnSQL, Sql, clLog)
+											DB.EsegueSql(idProc, Sql, clLog)
 										End If
 
 										Dimens = Int(FileLen(FileOrigine) / 1024)
@@ -1228,14 +1282,15 @@ Public Class OperazioniSuFileDettagli
 			Else
 				If Intelligente Then
 					If AggiornataTabellaIntelligente = False Then
-						AggiornaTabellaIntelligente(instance, idProc, Progressivo, DB, ConnSQL, lblOperazione, lblContatore, ModalitaServizio, clLog)
+						AggiornaTabellaIntelligente(instance, idProc, Progressivo, DB, lblOperazione, lblContatore, ModalitaServizio, clLog)
 					End If
 				End If
 			End If
 
-			DB.ChiudeDB(True, ConnSQL)
+			'ConnSQL.Close()
+			DB.ChiudeDB(True)
 
-			ConnSQL = Nothing
+			'ConnSQL = Nothing
 			DB = Nothing
 
 			Dim GA As New GestioneACCESS
@@ -1243,6 +1298,12 @@ Public Class OperazioniSuFileDettagli
 			GA.CompattazioneDb()
 			GA = Nothing
 		Else
+			ConnSQL.Close()
+			DB.ChiudeDB(True)
+
+			ConnSQL = Nothing
+			DB = Nothing
+
 			ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Impossibile aprire il DB", " ", ModalitaServizio, clLog)
 		End If
 		'Catch ex As Exception
@@ -1253,96 +1314,96 @@ Public Class OperazioniSuFileDettagli
 	End Function
 
 	Private lblOperazione As Label
-    Private lblContatore As Label
+	Private lblContatore As Label
 
-    Private Sub AddTextOperazione(ByVal str As String)
-        lblOperazione.Text = str
-    End Sub
+	Private Sub AddTextOperazione(ByVal str As String)
+		lblOperazione.Text = str
+	End Sub
 
-    Private Sub AddTextContatore(ByVal str As String)
-        lblContatore.Text = str
-    End Sub
+	Private Sub AddTextContatore(ByVal str As String)
+		lblContatore.Text = str
+	End Sub
 
-    Private Delegate Sub DelegateAddTextOperazione(ByVal str As String)
-    Private MethodDelegateAddTextOperazione As New DelegateAddTextOperazione(AddressOf AddTextOperazione)
+	Private Delegate Sub DelegateAddTextOperazione(ByVal str As String)
+	Private MethodDelegateAddTextOperazione As New DelegateAddTextOperazione(AddressOf AddTextOperazione)
 
-    Private Delegate Sub DelegateAddTextContatore(ByVal str As String)
-    Private MethodDelegateAddTextContatore As New DelegateAddTextContatore(AddressOf AddTextContatore)
+	Private Delegate Sub DelegateAddTextContatore(ByVal str As String)
+	Private MethodDelegateAddTextContatore As New DelegateAddTextContatore(AddressOf AddTextContatore)
 
-    Private Sub AggiornaTabellaIntelligente(instance As Form, idProc As Integer, Progressivo As Integer, DB As GestioneACCESS, ConnSql As Object, lblOperazione As Label,
-                                            lblContatore As Label, ModalitaServizio As Boolean, clLog As LogCasareccio.LogCasareccio.Logger)
-        Dim Sql As String = ""
+	Private Sub AggiornaTabellaIntelligente(instance As Form, idProc As Integer, Progressivo As Integer, DB As GestioneACCESS, lblOperazione As Label,
+											lblContatore As Label, ModalitaServizio As Boolean, clLog As LogCasareccio.LogCasareccio.Logger)
+		Dim Sql As String = ""
 
-        ' Copio la tabella di origine in quella di destinazione in caso di sincronia intelligente
-        ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Aggiornamento tabella di sincronia", " ", ModalitaServizio, clLog)
+		' Copio la tabella di origine in quella di destinazione in caso di sincronia intelligente
+		ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Aggiornamento tabella di sincronia", " ", ModalitaServizio, clLog)
 
-        Sql = "Delete * From FileDestinazioneIntelligente Where idProc=" & idProc & " And Operazione=" & Progressivo
-        DB.EsegueSql(idProc, ConnSql, Sql, clLog)
+		Sql = "Delete * From FileDestinazioneIntelligente Where idProc=" & idProc & " And Operazione=" & Progressivo
+		DB.EsegueSql(idProc, Sql, clLog)
 
-        Dim c As Long = 0
-        Dim d As Date
-        Dim mese As String
-        Dim giorno As String
-        Dim ora As String
-        Dim minuti As String
-        Dim secondi As String
-        Dim Rec2 As Object = CreateObject("ADODB.Recordset")
-        Dim DatellaFile As String = ""
-        Dim gf As New GestioneFilesDirectory
+		Dim c As Long = 0
+		Dim d As Date
+		Dim mese As String
+		Dim giorno As String
+		Dim ora As String
+		Dim minuti As String
+		Dim secondi As String
+		Dim Rec2 As New ADODB.Recordset
+		Dim DatellaFile As String = ""
+		Dim gf As New GestioneFilesDirectory
 
-        Sql = "Select * From FilesOrigine"
-        Rec2 = DB.LeggeQuery(idProc, ConnSql, Sql, clLog)
-        Do Until Rec2.Eof
-            c += 1
-            d = Rec2(2).Value
+		Sql = "Select * From FilesOrigine"
+		Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
+		Do Until Rec2.Eof
+			c += 1
+			d = Rec2(2).Value
 
-            mese = d.Month.ToString.Trim : If mese.Length = 1 Then mese = "0" & mese
-            giorno = d.Day.ToString.Trim : If giorno.Length = 1 Then giorno = "0" & giorno
-            ora = d.Hour.ToString.Trim : If ora.Length = 1 Then ora = "0" & ora
-            minuti = d.Minute.ToString.Trim : If minuti.Length = 1 Then minuti = "0" & minuti
-            secondi = d.Second.ToString.Trim : If secondi.Length = 1 Then secondi = "0" & secondi
+			mese = d.Month.ToString.Trim : If mese.Length = 1 Then mese = "0" & mese
+			giorno = d.Day.ToString.Trim : If giorno.Length = 1 Then giorno = "0" & giorno
+			ora = d.Hour.ToString.Trim : If ora.Length = 1 Then ora = "0" & ora
+			minuti = d.Minute.ToString.Trim : If minuti.Length = 1 Then minuti = "0" & minuti
+			secondi = d.Second.ToString.Trim : If secondi.Length = 1 Then secondi = "0" & secondi
 
-            DatellaFile = d.Year & "-"
-            DatellaFile &= mese & "-"
-            DatellaFile &= giorno & " "
-            DatellaFile &= ora & ":"
-            DatellaFile &= minuti & ":"
-            DatellaFile &= secondi
+			DatellaFile = d.Year & "-"
+			DatellaFile &= mese & "-"
+			DatellaFile &= giorno & " "
+			DatellaFile &= ora & ":"
+			DatellaFile &= minuti & ":"
+			DatellaFile &= secondi
 
-            Sql = "Insert Into FileDestinazioneIntelligente Values (" &
-                 " " & idProc & ", " &
-                 " " & Progressivo & ", " &
-                 " " & c & ", " &
-                 "'" & Replace(Rec2(0).Value, "'", "''") & "', " &
-                 " " & Rec2(1).Value & ", " &
-                 "'" & DatellaFile & "' " &
-                 ")"
-            DB.EsegueSql(idProc, ConnSql, Sql, clLog)
+			Sql = "Insert Into FileDestinazioneIntelligente Values (" &
+				 " " & idProc & ", " &
+				 " " & Progressivo & ", " &
+				 " " & c & ", " &
+				 "'" & Replace(Rec2(0).Value, "'", "''") & "', " &
+				 " " & Rec2(1).Value & ", " &
+				 "'" & DatellaFile & "' " &
+				 ")"
+			DB.EsegueSql(idProc, Sql, clLog)
 
-            Rec2.MoveNext()
+			Rec2.MoveNext()
 
-            If c / 50 = Int(c / 50) Then
-                If Not lblContatore Is Nothing Then
-                    ' lblContatore.Text = gf.FormattaNumero(c, False)
-                    If instance.InvokeRequired Then
-                        instance.Invoke(MethodDelegateAddTextContatore, gf.FormattaNumero(c, False))
-                    Else
-                        lblContatore.Text = gf.FormattaNumero(c, False)
-                    End If
-                End If
+			If c / 50 = Int(c / 50) Then
+				If Not lblContatore Is Nothing Then
+					' lblContatore.Text = gf.FormattaNumero(c, False)
+					If instance.InvokeRequired Then
+						instance.Invoke(MethodDelegateAddTextContatore, gf.FormattaNumero(c, False))
+					Else
+						lblContatore.Text = gf.FormattaNumero(c, False)
+					End If
+				End If
 
-                Application.DoEvents()
-            End If
-        Loop
-        Rec2.Close()
+				Application.DoEvents()
+			End If
+		Loop
+		Rec2.Close()
 
-        Sql = "Delete * From FilesOrigine"
-        DB.EsegueSql(idProc, ConnSql, Sql, clLog)
+		Sql = "Delete * From FilesOrigine"
+		DB.EsegueSql(idProc, Sql, clLog)
 
-        ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Aggiornate righe sincronia: " & gf.FormattaNumero(c, False) & " - idProc: " & idProc & " - Operazione: " & Progressivo, " ", ModalitaServizio, clLog)
-    End Sub
+		ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Aggiornate righe sincronia: " & gf.FormattaNumero(c, False) & " - idProc: " & idProc & " - Operazione: " & Progressivo, " ", ModalitaServizio, clLog)
+	End Sub
 
-    Public Function EsegueZip(idProc As Integer, Origine As String, Destinazione As String, lblOperazione As Label, lblContatore As Label, ModalitaServizio As Boolean,
+	Public Function EsegueZip(idProc As Integer, Origine As String, Destinazione As String, lblOperazione As Label, lblContatore As Label, ModalitaServizio As Boolean,
                               instance As Form, clLog As LogCasareccio.LogCasareccio.Logger) As StringBuilder
         ScriveLog(idProc, "ZIP FILES: " & Origine & "->" & Destinazione, clLog)
 

@@ -39,9 +39,6 @@ Public Class frmMain
 		NotifyIcon1.ContextMenu = Me.contextMenu1
 		NotifyIcon1.Visible = True
 
-		Dim u As UpdateDB = New UpdateDB
-		u.ControllaAggiornamentoDB(Nothing)
-
 		Timer1.Enabled = True
 	End Sub
 
@@ -106,6 +103,9 @@ Public Class frmMain
 
 	Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 		Dim PercorsoDB As String
+
+		Dim u As UpdateDB = New UpdateDB
+		u.ControllaAggiornamentoDB(Nothing)
 
 		Dim gf As New GestioneFilesDirectory
 		Dim Config As String = ""
@@ -229,27 +229,28 @@ Public Class frmMain
 		Dim DB As New GestioneACCESS
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-			Dim ConnSQL As Object = DB.ApreDB(0, Nothing)
-			Dim Rec As Object = CreateObject("ADODB.Recordset")
+			DB.ApreDB(0, Nothing)
+			Dim Rec As New ADODB.Recordset
 			Dim Sql As String
 
 			Sql = "Select * From UltimeDirOrig"
-			Rec = DB.LeggeQuery(0, ConnSQL, Sql, Nothing)
+			Rec = DB.LeggeQuery(0, Sql, Nothing)
 			If Rec Is Nothing Then
 				Sql = "Create Table UltimeDirOrig (Dir Memo, PRIMARY KEY (Dir))"
-				DB.EsegueSql(-1, ConnSQL, Sql, Nothing)
+				DB.EsegueSql(-1, Sql, Nothing)
 			Else
-				Rec.Close
+				Rec.Close()
 			End If
 
 			'Sql = "Select * From UltimeDirDestin"
-			'Rec = DB.LeggeQuery(0, ConnSQL, Sql, Nothing)
+			'Rec = DB.LeggeQuery(0, Sql, Nothing)
 			'If Rec Is Nothing Then
 			'	Sql = "Create Table UltimeDirDestin (Dir Memo, PRIMARY KEY (Dir))"
-			'	DB.EsegueSql(-1, ConnSQL, Sql, Nothing)
+			'	DB.EsegueSql(-1, Sql, Nothing)
 			'Else
 			'	Rec.Close
 			'End If
+			DB.ChiudeDB(True)
 		End If
 
 		DB = Nothing
@@ -284,8 +285,8 @@ Public Class frmMain
 		Dim DB As New GestioneACCESS
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-			Dim ConnSQL As Object = DB.ApreDB(0, clLog)
-			Dim Rec As Object = CreateObject("ADODB.Recordset")
+			DB.ApreDB(0, clLog)
+			Dim Rec As New ADODB.Recordset
 			Dim Sql As String
 
 			lstProcedure.Items.Clear()
@@ -293,7 +294,7 @@ Public Class frmMain
 			'cmbProcedure.Items.Add("NUOVA PROCEDURA")
 
 			Sql = "Select * From NomiProcedure Order By NomeProcedura"
-			Rec = DB.LeggeQuery(0, ConnSQL, Sql, clLog)
+			Rec = DB.LeggeQuery(0, Sql, clLog)
 			Do Until Rec.Eof
 				lstProcedure.Items.Add(Rec("NomeProcedura").Value)
 
@@ -301,12 +302,9 @@ Public Class frmMain
 			Loop
 			Rec.Close()
 
-			ConnSQL.close()
-			ConnSQL = Nothing
-
 			lstProcedure.Text = ""
 
-			DB.ChiudeDB(True, ConnSQL)
+			DB.ChiudeDB(True)
 		End If
 
 		cmdElimina.Visible = True
@@ -527,23 +525,20 @@ Public Class frmMain
 		Dim DB As New GestioneACCESS
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-			Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
+			DB.ApreDB(idProc, Nothing)
 			Dim Sql As String
 
 			Sql = "Delete From NomiProcedure Where idProc=" & idProc
-			DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+			DB.EsegueSql(idProc, Sql, Nothing)
 
 			Sql = "Delete From Schedulazioni Where idProc=" & idProc
-			DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+			DB.EsegueSql(idProc, Sql, Nothing)
 
 			Sql = "Delete From DettaglioProcedure Where idProc=" & idProc
-			DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+			DB.EsegueSql(idProc, Sql, Nothing)
 
-			ConnSQL.close()
-			ConnSQL = Nothing
-
+			DB.ChiudeDB(True)
 			DB.CompattazioneDb()
-			DB.ChiudeDB(True, ConnSQL)
 		End If
 
 		DB = Nothing

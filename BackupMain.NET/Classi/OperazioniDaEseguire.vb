@@ -40,9 +40,9 @@
 			Dim DB As GestioneACCESS = New GestioneACCESS
 
 			If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-				Dim ConnSQL As Object = DB.ApreDB(qId, Nothing)
+				DB.ApreDB(qId, Nothing)
 
-				Dim Rec As Object = CreateObject("ADODB.Recordset")
+				Dim Rec As New ADODB.Recordset
 				Dim Sql As String
 
 				' Controlla se esistono backup per l'ora e il giorno della settimana
@@ -55,7 +55,7 @@
 				'opFiles.ScriveLogServizio(idProc, "Controlla se esistono backup per l'ora e il giorno della settimana")
 				'opFiles.ScriveLogServizio(idProc, Sql)
 
-				Rec = DB.LeggeQuery(0, ConnSQL, Sql, Nothing)
+				Rec = DB.LeggeQuery(0, Sql, Nothing)
 				Do Until Rec.Eof
 					qId += 1
 					ReDim Preserve idProceduraDaEseguire(qId)
@@ -75,7 +75,7 @@
 				'opFiles.ScriveLogServizio(idProc, "Controlla se esistono backup per l'ora e il giorno del mese")
 				'opFiles.ScriveLogServizio(idProc, Sql)
 
-				Rec = DB.LeggeQuery(0, ConnSQL, Sql, Nothing)
+				Rec = DB.LeggeQuery(0, Sql, Nothing)
 				Do Until Rec.Eof
 					qId += 1
 					ReDim Preserve idProceduraDaEseguire(qId)
@@ -85,12 +85,10 @@
 				Loop
 				Rec.Close()
 
-				ConnSQL.close()
-				ConnSQL = Nothing
+				DB.ChiudeDB(True)
 			Else
 				opFiles.ScriveLogServizio(1, "ERRORE SU APERTURA DB")
 			End If
-
 			DB = Nothing
 		Catch ex As Exception
 			opFiles.ScriveLogServizio(1, "ERRORE PROCEDURALE: " & ex.Message)

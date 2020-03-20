@@ -60,21 +60,21 @@ Public Class frmSettaggi
             Dim DB As New GestioneACCESS
 
             If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-                Dim ConnSQL As Object = DB.ApreDB(0, Nothing)
-                Dim Rec As Object = CreateObject("ADODB.Recordset")
-                Dim Sql As String
+				DB.ApreDB(0, Nothing)
+				Dim Rec As New ADODB.Recordset
+				Dim Sql As String
 
                 Sql = "Delete From FilesOrigine"
-                DB.EsegueSql(0, ConnSQL, Sql, Nothing)
+				DB.EsegueSql(0, Sql, Nothing)
 
-                Sql = "Delete From FilesOrigine"
-                DB.EsegueSql(0, ConnSQL, Sql, Nothing)
+				Sql = "Delete From FilesOrigine"
+				DB.EsegueSql(0, Sql, Nothing)
 
-                Sql = "Delete From FileDestinazioneIntelligente"
-                DB.EsegueSql(0, ConnSQL, Sql, Nothing)
+				Sql = "Delete From FileDestinazioneIntelligente"
+				DB.EsegueSql(0, Sql, Nothing)
 
-                DB.ChiudeDB(True, ConnSQL)
-            End If
+				DB.ChiudeDB(True)
+			End If
 
             DB = Nothing
 

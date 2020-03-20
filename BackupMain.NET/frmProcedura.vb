@@ -41,12 +41,12 @@ Public Class frmProcedura
 		'Dim DB As New GestioneACCESS
 
 		'If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp , "ConnDB") = True Then
-		'    Dim ConnSQL As Object = DB.ApreDB(idProc)
-		'    Dim Rec As Object = CreateObject("ADODB.Recordset")
+		'    Db.ApreDB(idProc)
+		'    Dim Rec As new ADODB.Recordset
 		'    Dim Sql As String
 
 		'    Sql = "Select * From LogOperazioni Where idProc=" & idProc
-		'    Rec = DB.LeggeQuery(idProc, ConnSQL, Sql)
+		'    Rec = DB.LeggeQuery(idProc, Sql)
 		'    If Rec.Eof = False Then
 		'        cmdLog.Visible = True
 		'    Else
@@ -159,17 +159,17 @@ Public Class frmProcedura
 		Dim DB As New GestioneACCESS
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-			Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
-			Dim Rec As Object = CreateObject("ADODB.Recordset")
+			DB.ApreDB(idProc, Nothing)
+			Dim Rec As New ADODB.Recordset
 			Dim Sql As String
 
 			Sql = "Select * From DettaglioProcedure Where idProc=" & idProc & " And Progressivo=" & Progressivo
-			Rec = DB.LeggeQuery(idProc, ConnSQL, Sql, Nothing)
+			Rec = DB.LeggeQuery(idProc, Sql, Nothing)
 			lblProgressivo.Text = Progressivo
 			cmbOperazioni.Text = Operazione
 			lblOrigine.Text = Rec("Origine").Value.ToString.Trim
 			lblDestinazione.Text = Rec("Destinazione").Value.ToString.Trim
-			If Rec("Sovrascrivi").value.ToString.Trim = "S" Then
+			If Rec("Sovrascrivi").Value.ToString.Trim = "S" Then
 				chkSovrascrivi.Checked = True
 			Else
 				chkSovrascrivi.Checked = False
@@ -193,7 +193,7 @@ Public Class frmProcedura
 
 			If Operazione.Contains("Intelligente") Then
 				Sql = "Select Count(*) From FileDestinazioneIntelligente Where idProc=" & idProc & " And Operazione=" & Progressivo
-				Rec = DB.LeggeQuery(idProc, ConnSQL, Sql, Nothing)
+				Rec = DB.LeggeQuery(idProc, Sql, Nothing)
 				If Rec(0).Value Is DBNull.Value Then
 					lblRighe.Text = 0
 				Else
@@ -227,10 +227,7 @@ Public Class frmProcedura
 				cmdSopraSotto.Visible = False
 			End If
 
-			ConnSQL.close()
-			ConnSQL = Nothing
-
-			DB.ChiudeDB(True, ConnSQL)
+			DB.ChiudeDB(True)
 		End If
 
 		DB = Nothing
@@ -272,16 +269,13 @@ Public Class frmProcedura
 		Dim DB As New GestioneACCESS
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-			Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
-			Dim Rec As Object = CreateObject("ADODB.Recordset")
+			DB.ApreDB(idProc, Nothing)
+			Dim Rec As New ADODB.Recordset
 			Dim Sql As String
 			Dim Riga As Integer = lstOperazioni.SelectedIndex
 
 			Sql = "Delete From DettaglioProcedure Where idProc=" & idProc & " And Progressivo=" & lblProgressivo.Text
-			DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
-
-			ConnSQL.close()
-			ConnSQL = Nothing
+			DB.EsegueSql(idProc, Sql, Nothing)
 
 			Dim opFile As New OperazioniSuFile
 			idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lblNomeProc.Text, lstOperazioni)
@@ -295,7 +289,7 @@ Public Class frmProcedura
 
 			End Try
 
-			DB.ChiudeDB(True, ConnSQL)
+			DB.ChiudeDB(True)
 		End If
 
 		DB = Nothing
@@ -318,8 +312,8 @@ Public Class frmProcedura
 		Dim DB As New GestioneACCESS
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-			Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
-			Dim Rec As Object = CreateObject("ADODB.Recordset")
+			DB.ApreDB(idProc, Nothing)
+			Dim Rec As New ADODB.Recordset
 			Dim Sql As String
 			Dim Progressivo As Integer
 			Dim Operazione As Integer
@@ -411,7 +405,7 @@ Public Class frmProcedura
 
 			If idProc = -1 Then
 				Sql = "Select Max(idProc) From NomiProcedure"
-				Rec = DB.LeggeQuery(idProc, ConnSQL, Sql, Nothing)
+				Rec = DB.LeggeQuery(idProc, Sql, Nothing)
 				If Rec(0).Value Is DBNull.Value = True Then
 					Progressivo = 1
 				Else
@@ -430,7 +424,7 @@ Public Class frmProcedura
 						"'', " &
 						"'" & InvioMail & "' " &
 						")"
-				DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+				DB.EsegueSql(idProc, Sql, Nothing)
 
 				lblNomeProc.Text = txtNomeProcedura.Text
 				lblTitNomeProc.Visible = False
@@ -455,7 +449,7 @@ Public Class frmProcedura
 
 			If lblProgressivo.Text = "" Then
 				Sql = "Select Max(Progressivo) From DettaglioProcedure Where idProc=" & idProc
-				Rec = DB.LeggeQuery(idProc, ConnSQL, Sql, Nothing)
+				Rec = DB.LeggeQuery(idProc, Sql, Nothing)
 				If Rec(0).Value Is DBNull.Value = True Then
 					Progressivo = 1
 				Else
@@ -495,12 +489,9 @@ Public Class frmProcedura
 					"Where idProc=" & idProc & " And Progressivo=" & lblProgressivo.Text
 			End If
 
-			DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+			DB.EsegueSql(idProc, Sql, Nothing)
 
-			OrdinaOperazioni(idProc, ConnSQL, DB)
-
-			ConnSQL.close()
-			ConnSQL = Nothing
+			OrdinaOperazioni(idProc, DB)
 
 			Dim opFile As New OperazioniSuFile
 			idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lblNomeProc.Text, lstOperazioni)
@@ -508,15 +499,15 @@ Public Class frmProcedura
 
 			PulisceCampi()
 
-			DB.ChiudeDB(True, ConnSQL)
+			DB.ChiudeDB(True)
 		End If
 
 		DB = Nothing
 	End Sub
 
-	Private Sub OrdinaOperazioni(idProc As Integer, ConnSql As Object, DB As GestioneACCESS)
+	Private Sub OrdinaOperazioni(idProc As Integer, DB As GestioneACCESS)
 		Dim Sql As String = "Drop Table Appoggio"
-		DB.EsegueSql(idProc, ConnSql, Sql, Nothing)
+		DB.EsegueSql(idProc, Sql, Nothing)
 
 		Sql = "SELECT idProc, (SELECT Count(*) FROM DettaglioProcedure T2 WHERE t2.Origine+str(t2.Progressivo) < DettaglioProcedure.Origine+str(DettaglioProcedure.Progressivo)) As Progressivo, " &
 			"idOperazione, Origine, Destinazione, Sovrascrivi, Sottodirectory, Filtro, Parametro, UtenzaOrigine, PasswordOrigine, UtenzaDestinazione, PasswordDestinazione, Attivo " &
@@ -524,13 +515,13 @@ Public Class frmProcedura
 			"FROM DettaglioProcedure " &
 			"WHERE idProc = " & idProc & " " &
 			"ORDER BY DettaglioProcedure.Origine, DettaglioProcedure.Destinazione"
-		DB.EsegueSql(idProc, ConnSql, Sql, Nothing)
+		DB.EsegueSql(idProc, Sql, Nothing)
 
 		Sql = "Delete * From DettaglioProcedure Where idProc = " & idProc
-		DB.EsegueSql(idProc, ConnSql, Sql, Nothing)
+		DB.EsegueSql(idProc, Sql, Nothing)
 
 		Sql = "Insert Into DettaglioProcedure Select * From Appoggio"
-		DB.EsegueSql(idProc, ConnSql, Sql, Nothing)
+		DB.EsegueSql(idProc, Sql, Nothing)
 	End Sub
 
 	Private Sub cmbOperazioni_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbOperazioni.SelectedIndexChanged
@@ -741,24 +732,21 @@ Public Class frmProcedura
 		Dim DB As New GestioneACCESS
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-			Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
+			DB.ApreDB(idProc, Nothing)
 			Dim Sql As String
 
 			Sql = "Delete From NomiProcedure Where idProc=" & idProc
-			DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+			DB.EsegueSql(idProc, Sql, Nothing)
 
 			Sql = "Delete From Schedulazioni Where idProc=" & idProc
-			DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+			DB.EsegueSql(idProc, Sql, Nothing)
 
 			Sql = "Delete From DettaglioProcedure Where idProc=" & idProc
-			DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
-
-			ConnSQL.close()
-			ConnSQL = Nothing
+			DB.EsegueSql(idProc, Sql, Nothing)
 
 			DB.CompattazioneDb()
 
-			DB.ChiudeDB(True, ConnSQL)
+			DB.ChiudeDB(True)
 		End If
 
 		DB = Nothing
@@ -778,16 +766,13 @@ Public Class frmProcedura
 			Dim DB As New GestioneACCESS
 
 			If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-				Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
+				DB.ApreDB(idProc, Nothing)
 				Dim Sql As String
 
 				Sql = "Update NomiProcedure Set NomeProcedura ='" & NuovoNome.Trim.Replace("'", "''") & "' Where idProc=" & idProc
-				DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+				DB.EsegueSql(idProc, Sql, Nothing)
 
-				ConnSQL.close()
-				ConnSQL = Nothing
-
-				DB.ChiudeDB(True, ConnSQL)
+				DB.ChiudeDB(True)
 			End If
 
 			DB = Nothing
@@ -805,35 +790,32 @@ Public Class frmProcedura
 		Dim numRiga As Integer = lstOperazioni.SelectedIndex
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-			Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
+			DB.ApreDB(idProc, Nothing)
 			Dim Sql As String
 			Dim Riga As String = lstOperazioni.Text
-			Dim Rec As Object = CreateObject("ADODB.Recordset")
+			Dim Rec As New ADODB.Recordset
 			Dim Progressivo As Integer = Mid(Riga, 1, 3).Trim
 			Dim Successivo As Integer = -1
 
 			Sql = "Select Top 1 * From DettaglioProcedure Where idProc=" & idProc & " And Progressivo>" & Progressivo & " Order By Progressivo"
-			Rec = DB.LeggeQuery(idProc, ConnSQL, Sql, Nothing)
-			If Rec.Eof = False Then
+			Rec = DB.LeggeQuery(idProc, Sql, Nothing)
+			If Rec.EOF = False Then
 				Successivo = Rec("Progressivo").Value
 			End If
 			Rec.Close()
 
 			If Successivo > -1 Then
 				Sql = "Update DettaglioProcedure Set Progressivo=999 Where idProc=" & idProc & " And Progressivo=" & Progressivo
-				DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+				DB.EsegueSql(idProc, Sql, Nothing)
 
 				Sql = "Update DettaglioProcedure Set Progressivo=" & Progressivo & " Where idProc=" & idProc & " And Progressivo=" & Successivo
-				DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+				DB.EsegueSql(idProc, Sql, Nothing)
 
 				Sql = "Update DettaglioProcedure Set Progressivo=" & Successivo & " Where idProc=" & idProc & " And Progressivo=999"
-				DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+				DB.EsegueSql(idProc, Sql, Nothing)
 			End If
 
-			ConnSQL.close()
-			ConnSQL = Nothing
-
-			DB.ChiudeDB(True, ConnSQL)
+			DB.ChiudeDB(True)
 		End If
 
 		DB = Nothing
@@ -856,15 +838,15 @@ Public Class frmProcedura
 		Dim numRiga As Integer = lstOperazioni.SelectedIndex
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-			Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
+			DB.ApreDB(idProc, Nothing)
 			Dim Sql As String
 			Dim Riga As String = lstOperazioni.Text
-			Dim Rec As Object = CreateObject("ADODB.Recordset")
+			Dim Rec As New ADODB.Recordset
 			Dim Progressivo As Integer = Mid(Riga, 1, 3).Trim
 			Dim Successivo As Integer = -1
 
 			Sql = "Select Top 1 * From DettaglioProcedure Where idProc=" & idProc & " And Progressivo<" & Progressivo & " Order By Progressivo Desc"
-			Rec = DB.LeggeQuery(idProc, ConnSQL, Sql, Nothing)
+			Rec = DB.LeggeQuery(idProc, Sql, Nothing)
 			If Rec.Eof = False Then
 				Successivo = Rec("Progressivo").Value
 			End If
@@ -872,19 +854,16 @@ Public Class frmProcedura
 
 			If Successivo > -1 Then
 				Sql = "Update DettaglioProcedure Set Progressivo=999 Where idProc=" & idProc & " And Progressivo=" & Progressivo
-				DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+				DB.EsegueSql(idProc, Sql, Nothing)
 
 				Sql = "Update DettaglioProcedure Set Progressivo=" & Progressivo & " Where idProc=" & idProc & " And Progressivo=" & Successivo
-				DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+				DB.EsegueSql(idProc, Sql, Nothing)
 
 				Sql = "Update DettaglioProcedure Set Progressivo=" & Successivo & " Where idProc=" & idProc & " And Progressivo=999"
-				DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+				DB.EsegueSql(idProc, Sql, Nothing)
 			End If
 
-			ConnSQL.close()
-			ConnSQL = Nothing
-
-			DB.ChiudeDB(True, ConnSQL)
+			DB.ChiudeDB(True)
 		End If
 
 		DB = Nothing
@@ -1021,12 +1000,12 @@ Public Class frmProcedura
 		Dim DB As New GestioneACCESS
 
 		If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-			Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
+			DB.ApreDB(idProc, Nothing)
 			Dim Sql As String = "Update DettaglioProcedure Set Attivo='N' Where idProc=" & idProc
 
-			DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+			DB.EsegueSql(idProc, Sql, Nothing)
 
-			DB.ChiudeDB(True, ConnSQL)
+			DB.ChiudeDB(True)
 		End If
 
 		DB = Nothing
@@ -1155,14 +1134,14 @@ Public Class frmProcedura
 				Me.Cursor = Cursors.WaitCursor
 				Dim DB As New GestioneACCESS
 				If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-					Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
+					DB.ApreDB(idProc, Nothing)
 					Dim Sql As String = "Delete From FileDestinazioneIntelligente Where idProc=" & idProc & " And Operazione=" & Progressivo
 
-					DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+					DB.EsegueSql(idProc, Sql, Nothing)
 
 					DB.CompattazioneDb()
 
-					DB.ChiudeDB(True, ConnSQL)
+					DB.ChiudeDB(True)
 				End If
 
 				DB = Nothing
@@ -1180,15 +1159,15 @@ Public Class frmProcedura
 		If idProc > 0 Then
 			Dim DB As New GestioneACCESS
 			If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-				Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
+				DB.ApreDB(idProc, Nothing)
 				Dim InvioMail As String = IIf(chkinviaMail.Checked, "S", "N")
 				Dim Sql As String = "Update NomiProcedure Set InvioMail='" & InvioMail & "' Where idProc=" & idProc
 
-				DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+				DB.EsegueSql(idProc, Sql, Nothing)
 
 				DB.CompattazioneDb()
 
-				DB.ChiudeDB(True, ConnSQL)
+				DB.ChiudeDB(True)
 			End If
 
 			DB = Nothing
@@ -1205,15 +1184,15 @@ Public Class frmProcedura
 				Me.Cursor = Cursors.WaitCursor
 				Dim DB As New GestioneACCESS
 				If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-                    Dim ConnSQL As Object = DB.ApreDB(idProc, Nothing)
-                    Dim Sql As String = "Delete From FileDestinazioneIntelligente Where idProc=" & idProc
+					DB.ApreDB(idProc, Nothing)
+					Dim Sql As String = "Delete From FileDestinazioneIntelligente Where idProc=" & idProc
 
-                    DB.EsegueSql(idProc, ConnSQL, Sql, Nothing)
+					DB.EsegueSql(idProc, Sql, Nothing)
 
-                    DB.CompattazioneDb()
+					DB.CompattazioneDb()
 
-                    DB.ChiudeDB(True, ConnSQL)
-                End If
+					DB.ChiudeDB(True)
+				End If
 
                 DB = Nothing
 

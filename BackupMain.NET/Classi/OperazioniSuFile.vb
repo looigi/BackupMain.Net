@@ -7,9 +7,9 @@ Imports frmLog
 
 Public Class OperazioniSuFile
     Private DB As New GestioneACCESS
-    Private ConnSQL As Object
+	' Private ConnSQL As Object
 
-    Private NumeroCampiTabella As Integer = 13
+	Private NumeroCampiTabella As Integer = 13
     Public RigheProcedura(200, NumeroCampiTabella) As String
 
     'Private NomeFileLog As String = ""
@@ -112,198 +112,195 @@ Public Class OperazioniSuFile
 
         Try
             Dim Db As New GestioneACCESS
-            Dim ConnSQL As Object = CreateObject("ADODB.Connection")
+			If Db.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
+				Dim Rec As New ADODB.Recordset
+				Db.ApreDB(idProc, clLog)
+				Dim Riga As Integer = 0
+				Dim Sql As String
 
-            If Db.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-                Dim Rec As Object = CreateObject("ADODB.Recordset")
-                ConnSQL = Db.ApreDB(idProc, clLog)
-                Dim Riga As Integer = 0
-                Dim Sql As String
+				Sql = "Select * From DettaglioProcedure Where idProc=" & idProc & " Order By Progressivo"
+				Rec = Db.LeggeQuery(idProc, Sql, clLog)
+				Do Until Rec.EOF
+					For i As Integer = 0 To NumeroCampiTabella
+						RigheProcedura(Riga, i) = Rec(i).Value.ToString
+					Next
+					Riga += 1
 
-                Sql = "Select * From DettaglioProcedure Where idProc=" & idProc & " Order By Progressivo"
-                Rec = Db.LeggeQuery(idProc, ConnSQL, Sql, clLog)
-                Do Until Rec.Eof
-                    For i As Integer = 0 To NumeroCampiTabella
-                        RigheProcedura(Riga, i) = Rec(i).Value.ToString
-                    Next
-                    Riga += 1
+					Rec.MoveNext()
+				Loop
+				Rec.Close()
+				RigheProcedura(Riga, 0) = "***"
 
-                    Rec.MoveNext()
-                Loop
-                Rec.Close()
-                RigheProcedura(Riga, 0) = "***"
+				' ConnSQL.Close()
+				Db.ChiudeDB(True)
+				Db = Nothing
+			End If
+		Catch ex As Exception
 
-                Db.ChiudeDB(True, ConnSQL)
-                Db = Nothing
-            End If
-        Catch ex As Exception
+		End Try
 
-        End Try
+		Return RigheProcedura
+	End Function
 
-        Return RigheProcedura
-    End Function
+	Public Sub RilasciaOggetti()
+		' ConnSQL.close()
+		' ConnSQL = Nothing
 
-    Public Sub RilasciaOggetti()
-        ConnSQL.close()
-        ConnSQL = Nothing
+		DB = Nothing
+	End Sub
 
-        DB = Nothing
-    End Sub
+	Private Function SistemaLunghezzaCampo(Campo As String, Lunghezza As String) As String
+		Dim Ritorno As String = Campo.Trim
 
-    Private Function SistemaLunghezzaCampo(Campo As String, Lunghezza As String) As String
-        Dim Ritorno As String = Campo.Trim
+		If Ritorno.Length < Lunghezza Then
+			For i As Integer = Ritorno.Length To Lunghezza
+				Ritorno = Ritorno & " "
+			Next
+		Else
+			Ritorno = Mid(Ritorno, 1, (Lunghezza / 2)) & "..." & Mid(Ritorno, Ritorno.Length - (Lunghezza / 2) + 3, Lunghezza)
+		End If
 
-        If Ritorno.Length < Lunghezza Then
-            For i As Integer = Ritorno.Length To Lunghezza
-                Ritorno = Ritorno & " "
-            Next
-        Else
-            Ritorno = Mid(Ritorno, 1, (Lunghezza / 2)) & "..." & Mid(Ritorno, Ritorno.Length - (Lunghezza / 2) + 3, Lunghezza)
-        End If
+		Return Ritorno
+	End Function
 
-        Return Ritorno
-    End Function
+	Public Function CaricaDatiProcedura(ModalitaEsecuzioneAutomatica As Boolean, PercorsoDBTemp As String, idProc As Integer, clLog As LogCasareccio.LogCasareccio.Logger) As String
+		Dim Ritorno As String = ""
 
-    Public Function CaricaDatiProcedura(ModalitaEsecuzioneAutomatica As Boolean, PercorsoDBTemp As String, idProc As Integer, clLog As LogCasareccio.LogCasareccio.Logger) As String
-        Dim Ritorno As String = ""
+		Try
+			Dim InvioMail As String = "N"
+			Dim DB As New GestioneACCESS
 
-        Try
-            Dim InvioMail As String = "N"
-            Dim DB As New GestioneACCESS
+			If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
+				DB.ApreDB(idProc, clLog)
+				Dim Rec As New ADODB.Recordset
+				Dim Sql As String = "Select * From NomiProcedure Where idProc=" & idProc
 
-            If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-                Dim ConnSQL As Object = DB.ApreDB(idProc, clLog)
-                Dim Rec As Object = CreateObject("ADODB.Recordset")
-                Dim Sql As String = "Select * From NomiProcedure Where idProc=" & idProc
+				Rec = DB.LeggeQuery(idProc, Sql, clLog)
+				If Rec.EOF = False Then
+					InvioMail = Rec("InvioMail").Value
+				End If
+				Rec.Close()
 
-                Rec = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
-                If Rec.Eof = False Then
-                    InvioMail = Rec("InvioMail").Value
-                End If
-                Rec.Close()
+				Ritorno = InvioMail & ";"
 
-                Ritorno = InvioMail & ";"
+				' ConnSQL.Close()
+				DB.ChiudeDB(True)
+			End If
 
-                DB.ChiudeDB(True, ConnSQL)
-            End If
+			DB = Nothing
+		Catch ex As Exception
 
-            DB = Nothing
-        Catch ex As Exception
+		End Try
 
-        End Try
+		Return Ritorno
+	End Function
 
-        Return Ritorno
-    End Function
+	Public Function CaricaRigheProcedura(ModalitaEsecuzioneAutomatica As Boolean, PercorsoDBTemp As String, Procedura As String,
+										 Optional lstOperazioni As ListBox = Nothing, Optional clLog As LogCasareccio.LogCasareccio.Logger = Nothing) As Integer
+		Dim idProc As Integer
 
-    Public Function CaricaRigheProcedura(ModalitaEsecuzioneAutomatica As Boolean, PercorsoDBTemp As String, Procedura As String,
-                                         Optional lstOperazioni As ListBox = Nothing, Optional clLog As LogCasareccio.LogCasareccio.Logger = Nothing) As Integer
-        Dim idProc As Integer
+		Try
+			Dim DB As New GestioneACCESS
 
-        Try
-            Dim DB As New GestioneACCESS
+			If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
+				DB.ApreDB(idProc, clLog)
+				Dim Rec As New ADODB.Recordset
+				Dim Sql As String
 
-            If DB.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-                Dim ConnSQL As Object = DB.ApreDB(idProc, clLog)
-                Dim Rec As Object = CreateObject("ADODB.Recordset")
-                Dim Sql As String
+				idProc = -1
 
-                idProc = -1
+				If lstOperazioni Is Nothing = False Then
+					lstOperazioni.Items.Clear()
+				End If
 
-                If lstOperazioni Is Nothing = False Then
-                    lstOperazioni.Items.Clear()
-                End If
+				Sql = "Select idProc From NomiProcedure Where NomeProcedura='" & Procedura & "'"
+				Rec = DB.LeggeQuery(idProc, Sql, clLog)
+				If Rec.Eof = False Then
+					idProc = Rec(0).Value
+				End If
+				Rec.Close()
 
-                Sql = "Select idProc From NomiProcedure Where NomeProcedura='" & Procedura & "'"
-                Rec = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
-                If Rec.Eof = False Then
-                    idProc = Rec(0).Value
-                End If
-                Rec.Close()
+				If idProc <> -1 Then
+					Dim sTipoOperazione As String = ""
+					Dim sOrigine As String = ""
+					Dim sDestinazione As String = ""
+					Dim sSovrascrivi As String = ""
+					Dim sSottoDirectory As String = ""
+					Dim sFiltro As String = ""
+					Dim sProgressivo As String = ""
 
-                If idProc <> -1 Then
-                    Dim sTipoOperazione As String = ""
-                    Dim sOrigine As String = ""
-                    Dim sDestinazione As String = ""
-                    Dim sSovrascrivi As String = ""
-                    Dim sSottoDirectory As String = ""
-                    Dim sFiltro As String = ""
-                    Dim sProgressivo As String = ""
+					Sql = "Select * From DettaglioProcedure Where idProc=" & idProc & " Order By Progressivo"
+					Rec = DB.LeggeQuery(idProc, Sql, clLog)
+					Do Until Rec.Eof
+						sProgressivo = Rec("Progressivo").Value
+						If sProgressivo.Length = 1 Then
+							sProgressivo = " " & sProgressivo
+						End If
 
-                    Sql = "Select * From DettaglioProcedure Where idProc=" & idProc & " Order By Progressivo"
-                    Rec = DB.LeggeQuery(idProc, ConnSQL, Sql, clLog)
-                    Do Until Rec.Eof
-                        sProgressivo = Rec("Progressivo").Value
-                        If sProgressivo.Length = 1 Then
-                            sProgressivo = " " & sProgressivo
-                        End If
+						Select Case Rec("idOperazione").Value
+							Case TipoOperazione.Nulla
+								sTipoOperazione = ""
+							Case TipoOperazione.Copia
+								sTipoOperazione = "Copia"
+							Case TipoOperazione.CreaDirectory
+								sTipoOperazione = "Crea dir"
+							Case TipoOperazione.EliminaDirectory
+								sTipoOperazione = "Elimina dir"
+							Case TipoOperazione.Eliminazione
+								sTipoOperazione = "Elimina Files"
+							Case TipoOperazione.Sincronizzazione
+								sTipoOperazione = "Sincronizza"
+							Case TipoOperazione.SincroniaIntelligente
+								sTipoOperazione = "Sincronia Intelligente"
+							Case TipoOperazione.Spostamento
+								sTipoOperazione = "Sposta"
+							Case TipoOperazione.RiavvioPC
+								sTipoOperazione = "Riavvio"
+							Case TipoOperazione.AvvioServizio
+								sTipoOperazione = "Avvia Servizio"
+							Case TipoOperazione.FermaServizio
+								sTipoOperazione = "Ferma Servizio"
+							Case TipoOperazione.AvviaEseguibile
+								sTipoOperazione = "Avvia EXE"
+							Case TipoOperazione.FermaEseguibile
+								sTipoOperazione = "Ferma EXE"
+							Case TipoOperazione.Attendi
+								sTipoOperazione = "Attendi"
+							Case TipoOperazione.Zip
+								sTipoOperazione = "Zip"
+							Case TipoOperazione.ListaFiles
+								sTipoOperazione = "Lista Files"
+							Case TipoOperazione.Messaggio
+								sTipoOperazione = "Messaggio"
+							Case TipoOperazione.EsegueSQL
+								sTipoOperazione = "Esegue SQL Server"
+						End Select
 
-                        Select Case Rec("idOperazione").Value
-                            Case TipoOperazione.Nulla
-                                sTipoOperazione = ""
-                            Case TipoOperazione.Copia
-                                sTipoOperazione = "Copia"
-                            Case TipoOperazione.CreaDirectory
-                                sTipoOperazione = "Crea dir"
-                            Case TipoOperazione.EliminaDirectory
-                                sTipoOperazione = "Elimina dir"
-                            Case TipoOperazione.Eliminazione
-                                sTipoOperazione = "Elimina Files"
-                            Case TipoOperazione.Sincronizzazione
-                                sTipoOperazione = "Sincronizza"
-                            Case TipoOperazione.SincroniaIntelligente
-                                sTipoOperazione = "Sincronia Intelligente"
-                            Case TipoOperazione.Spostamento
-                                sTipoOperazione = "Sposta"
-                            Case TipoOperazione.RiavvioPC
-                                sTipoOperazione = "Riavvio"
-                            Case TipoOperazione.AvvioServizio
-                                sTipoOperazione = "Avvia Servizio"
-                            Case TipoOperazione.FermaServizio
-                                sTipoOperazione = "Ferma Servizio"
-                            Case TipoOperazione.AvviaEseguibile
-                                sTipoOperazione = "Avvia EXE"
-                            Case TipoOperazione.FermaEseguibile
-                                sTipoOperazione = "Ferma EXE"
-                            Case TipoOperazione.Attendi
-                                sTipoOperazione = "Attendi"
-                            Case TipoOperazione.Zip
-                                sTipoOperazione = "Zip"
-                            Case TipoOperazione.ListaFiles
-                                sTipoOperazione = "Lista Files"
-                            Case TipoOperazione.Messaggio
-                                sTipoOperazione = "Messaggio"
-                            Case TipoOperazione.EsegueSQL
-                                sTipoOperazione = "Esegue SQL Server"
-                        End Select
+						For i As Integer = sTipoOperazione.Length To 23
+							sTipoOperazione = sTipoOperazione & " "
+						Next
 
-                        For i As Integer = sTipoOperazione.Length To 23
-                            sTipoOperazione = sTipoOperazione & " "
-                        Next
+						sOrigine = SistemaLunghezzaCampo(Rec("Origine").Value, 40)
+						sDestinazione = SistemaLunghezzaCampo(Rec("Destinazione").Value, 40)
 
-                        sOrigine = SistemaLunghezzaCampo(Rec("Origine").Value, 40)
-                        sDestinazione = SistemaLunghezzaCampo(Rec("Destinazione").Value, 40)
+						sSottoDirectory = Rec("Sottodirectory").Value
+						sSovrascrivi = Rec("Sovrascrivi").Value
 
-                        sSottoDirectory = Rec("Sottodirectory").Value
-                        sSovrascrivi = Rec("Sovrascrivi").Value
+						sFiltro = Rec("Filtro").Value
 
-                        sFiltro = Rec("Filtro").Value
+						If lstOperazioni Is Nothing = False Then
+							lstOperazioni.Items.Add(sProgressivo & " " & sTipoOperazione & " " & sOrigine & " " & sDestinazione & " " & sSottoDirectory & " " & sSovrascrivi & " " & Rec("Attivo").Value & " " & sFiltro)
+						End If
 
-                        If lstOperazioni Is Nothing = False Then
-                            lstOperazioni.Items.Add(sProgressivo & " " & sTipoOperazione & " " & sOrigine & " " & sDestinazione & " " & sSottoDirectory & " " & sSovrascrivi & " " & Rec("Attivo").Value & " " & sFiltro)
-                        End If
+						Rec.MoveNext()
+					Loop
+					Rec.Close()
+				End If
 
-                        Rec.MoveNext()
-                    Loop
-                    Rec.Close()
-                End If
+				DB.ChiudeDB(True)
+			End If
 
-                ConnSQL.close()
-                ConnSQL = Nothing
-
-                DB.ChiudeDB(True, ConnSQL)
-            End If
-
-            DB = Nothing
+			DB = Nothing
         Catch ex As Exception
             idProc = -1
         End Try
