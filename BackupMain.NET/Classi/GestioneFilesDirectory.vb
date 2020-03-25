@@ -172,7 +172,7 @@ Public Class GestioneFilesDirectory
     Private Sub hdnlCopia(ByVal sender As Object, ByVal e As ElapsedEventArgs)
         If IsNothing(lblAggiornamento) = False Then
 			Secondi += 1
-			If Secondi <= 500 Then
+			If Secondi <= 1000 Then
 				Dim dime As Long = TornaDimensioneFile(NomDestCompleto)
 				Dim mess As String = "Copia file " & QuantiFiles & ": " & TagliaLunghezzaScritta(NomOrig, 45) & vbCrLf &
 				"Dimensioni: " & FormattaNumero(dime, False) & " - Secondi: " & Secondi

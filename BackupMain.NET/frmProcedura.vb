@@ -493,13 +493,13 @@ Public Class frmProcedura
 
 			OrdinaOperazioni(idProc, DB)
 
-			Dim opFile As New OperazioniSuFile
-			idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lblNomeProc.Text, lstOperazioni)
-			opFile = Nothing
-
 			PulisceCampi()
 
 			DB.ChiudeDB(True)
+
+			Dim opFile As New OperazioniSuFile
+			idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lblNomeProc.Text, lstOperazioni)
+			opFile = Nothing
 		End If
 
 		DB = Nothing
