@@ -107,42 +107,43 @@ Public Class OperazioniSuFile
         Next
     End Sub
 
-    Public Function TornaRecordsetRigheProcedura(ModalitaEsecuzioneAutomatica As Boolean, PercorsoDBTemp As String, idProc As Integer, clLog As LogCasareccio.LogCasareccio.Logger) As String(,)
+    Public Function TornaRecordsetRigheProcedura(ModalitaEsecuzioneAutomatica As Boolean, PercorsoDBTemp As String, idProc As Integer,
+                                                 clLog As LogCasareccio.LogCasareccio.Logger, Optional dbTemp As Boolean = False) As String(,)
         PulisceArray()
 
         Try
             Dim Db As New GestioneACCESS
-			If Db.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB") = True Then
-				Dim Rec As New ADODB.Recordset
-				Db.ApreDB(idProc, clLog)
-				Dim Riga As Integer = 0
-				Dim Sql As String
+            If Db.LeggeImpostazioniDiBase(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, "ConnDB",, clLog, dbTemp) = True Then
+                Dim Rec As New ADODB.Recordset
+                Db.ApreDB(idProc, clLog)
+                Dim Riga As Integer = 0
+                Dim Sql As String
 
-				Sql = "Select * From DettaglioProcedure Where idProc=" & idProc & " Order By Progressivo"
-				Rec = Db.LeggeQuery(idProc, Sql, clLog)
-				Do Until Rec.EOF
-					For i As Integer = 0 To NumeroCampiTabella
-						RigheProcedura(Riga, i) = Rec(i).Value.ToString
-					Next
-					Riga += 1
+                Sql = "Select * From DettaglioProcedure Where idProc=" & idProc & " Order By Progressivo"
+                Rec = Db.LeggeQuery(idProc, Sql, clLog)
+                Do Until Rec.EOF
+                    For i As Integer = 0 To NumeroCampiTabella
+                        RigheProcedura(Riga, i) = Rec(i).Value.ToString
+                    Next
+                    Riga += 1
 
-					Rec.MoveNext()
-				Loop
-				Rec.Close()
-				RigheProcedura(Riga, 0) = "***"
+                    Rec.MoveNext()
+                Loop
+                Rec.Close()
+                RigheProcedura(Riga, 0) = "***"
 
-				' ConnSQL.Close()
-				Db.ChiudeDB(True)
-				Db = Nothing
-			End If
-		Catch ex As Exception
+                ' ConnSQL.Close()
+                Db.ChiudeDB(True)
+                Db = Nothing
+            End If
+        Catch ex As Exception
 
-		End Try
+        End Try
 
-		Return RigheProcedura
-	End Function
+        Return RigheProcedura
+    End Function
 
-	Public Sub RilasciaOggetti()
+    Public Sub RilasciaOggetti()
 		' ConnSQL.close()
 		' ConnSQL = Nothing
 

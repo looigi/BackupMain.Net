@@ -19,54 +19,75 @@ Public Class GestioneACCESS
         End Try
     End Function
 
-    Public Function LeggeImpostazioniDiBase(ModalitaAutomatica As Boolean, PercorsoDBTemp As String, Chiave As String, Optional TipoDbPassato As Integer = -1) As Boolean
-        Dim PercorsoDB As String
-        Dim connectionString As String
+	Public Function LeggeImpostazioniDiBase(ModalitaAutomatica As Boolean, PercorsoDBTemp As String, Chiave As String,
+											Optional TipoDbPassato As Integer = -1, Optional clLog As Object = Nothing,
+											Optional DbTemp As Boolean = False) As Boolean
+		Dim PercorsoDB As String
+		Dim connectionString As String = ""
 
-        If ModalitaAutomatica Then
-            PercorsoDB = PercorsoDBTemp
+		If ModalitaAutomatica Then
+			PercorsoDB = PercorsoDBTemp
 			' connectionString = "Data Source=" & PercorsoDB & ";"
-			connectionString = "Driver={Microsoft Access Driver (*.mdb)};Dbq=" & PercorsoDB & "\DB\dbBackup.mdb;"
-			' Connessione = "Provider=Microsoft.ACE.OLEDB.12.0;Persist Security Info=False;" & connectionString
+			If DbTemp Or PercorsoDB.ToUpper.Contains(".MDB") Then
+				connectionString = "Driver={Microsoft Access Driver (*.mdb)};Dbq=" & PercorsoDB
+				' Connessione = "Provider=Microsoft.ACE.OLEDB.12.0;Persist Security Info=False;" & connectionString
+			Else
+				connectionString = "Driver={Microsoft Access Driver (*.mdb)};Dbq=" & PercorsoDB & "\DB\dbBackup.mdb;"
+				' Connessione = "Provider=Microsoft.ACE.OLEDB.12.0;Persist Security Info=False;" & connectionString
+			End If
 			Connessione = "Persist Security Info=False;" & connectionString & ";pooling=false;"
+
+			If Not clLog Is Nothing Then
+				clLog.ScriveLogServizio("Lettura impostazioni di base per modalità automatica: " & Connessione)
+			End If
 		Else
 			PercorsoDB = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\BackupNet", "PathDB", "")
 
-            If PercorsoDB = "" Then
-                Dim gf As New GestioneFilesDirectory
-                gf.CreaAggiornaFile("D:\Errore.txt", "ERRORE: Path DB Non trovato")
-                gf = Nothing
-                Stop
-            End If
+			If PercorsoDB = "" Then
+				Dim gf As New GestioneFilesDirectory
+				gf.CreaAggiornaFile("D:\Errore.txt", "ERRORE: Path DB Non trovato")
+				gf = Nothing
+				Stop
+			End If
 
-            Select Case TipoDbPassato
-                Case 1
-                    DBSql = TipoDB.Access
-                Case 2
-                    DBSql = TipoDB.SQLCE
-                Case -1
-                    ImpostaDBSqlAccess()
-            End Select
+			If Not clLog Is Nothing Then
+				clLog.ScriveLogServizio("Lettura impostazioni di base per modalità NON automatica 1: " & TipoDbPassato)
+			End If
 
-            Select Case DBSql
-                Case TipoDB.Access
+			Select Case TipoDbPassato
+				Case 1
+					DBSql = TipoDB.Access
+				Case 2
+					DBSql = TipoDB.SQLCE
+				Case -1
+					ImpostaDBSqlAccess()
+			End Select
+
+			Select Case DBSql
+				Case TipoDB.Access
 					' connectionString = "Data Source=" & PercorsoDB & "\DB\dbBackup.mdb;"
 					connectionString = "Driver={Microsoft Access Driver (*.mdb)};Dbq=" & PercorsoDB & "\DB\dbBackup.mdb;"
 
 					Connessione = "Persist Security Info=False;" & connectionString & ";Pooling=False;"
 				Case TipoDB.SQLCE
-                    connectionString = "Data Source=" & PercorsoDB & "\DB\dbBackup.sdf;"
-                    Connessione = "Provider=Microsoft.SQLSERVER.CE.OLEDB.4.0;" & connectionString
-                Case TipoDB.Niente
-                    Stop
-            End Select
-        End If
+					connectionString = "Data Source=" & PercorsoDB & "\DB\dbBackup.sdf;"
+					Connessione = "Provider=Microsoft.SQLSERVER.CE.OLEDB.4.0;" & connectionString
+				Case TipoDB.Niente
+					Stop
+			End Select
 
-        Return True
-    End Function
+			If Not clLog Is Nothing Then
+				clLog.ScriveLogServizio("Lettura impostazioni di base per modalità NON automatica 2: " & connectionString)
+				clLog.ScriveLogServizio("                                                          : " & Connessione)
+			End If
+		End If
+
+		Return True
+	End Function
 
 	Public Sub ApreDB(idProc As Integer, clLog As LogCasareccio.LogCasareccio.Logger) ' As Object
 		' Routine che apre il DB e vede se ci sono errori
+
 		Conn = New ADODB.Connection()
 		Try
 			Conn.Open(Connessione)
@@ -74,6 +95,7 @@ Public Class GestioneACCESS
 		Catch ex As Exception
 			'MsgBox(ex.Message)
 			If Not clLog Is Nothing Then
+				clLog.ScriveLogServizio("ERRORE SU CONNESSIONE:" & Connessione)
 				ScriveErrore(idProc, ex.Message, clLog)
 			End If
 		End Try

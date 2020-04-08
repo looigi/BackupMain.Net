@@ -43,8 +43,8 @@ Public Class frmEsecuzione
 
 		clLog.ScriveLogServizio("Caricamento righe procedura")
 		idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, Nome, lstOperazioni)
-		clLog.ScriveLogServizio("Caricamento recordset procedura")
-		Rec = opFile.TornaRecordsetRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, idProc, clLog)
+		clLog.ScriveLogServizio("Caricamento recordset procedura. Percorso Db Temp: " & PercorsoDBTemp)
+		Rec = opFile.TornaRecordsetRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, idProc, clLog, True)
 
 		clLog.ScriveLogServizio("Caricamento dettagli righe operazioni procedura")
 		Dim Campi As String = opFile.CaricaDatiProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, idProc, clLog)
