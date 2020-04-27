@@ -165,16 +165,33 @@ Public Class GestioneACCESS
 	Public Function LeggeQuery(idProc As Integer, ByVal Sql As String, clLog As LogCasareccio.LogCasareccio.Logger) As Object
 		Dim AperturaManuale As Boolean = ControllaAperturaConnessione(idProc, Conn, clLog)
 		Dim Rec As New ADODB.Recordset
+		Dim Mess As String = ""
+		Dim Conta As Integer = 0
 
-		Try
-			Rec.Open(Sql, Conn)
-		Catch ex As Exception
-			Rec = Nothing
+		Do While Mess = "" Or Mess.Contains("CONNESSIONE CHIUSA O")
+			Try
+				Rec.Open(Sql, Conn)
+				Mess = "OK"
+			Catch ex As Exception
+				Mess = ex.Message.ToUpper
+				If Mess.Contains("CONNESSIONE CHIUSA O") Then
+					System.Threading.Thread.Sleep(2000)
+					Conta += 1
+					If Conta = 5 Then
+						Mess = "KO"
+					Else
+						ApreDB(idProc, clLog)
+						Rec = New ADODB.Recordset
+					End If
+				Else
+					Rec = Nothing
+				End If
 
-			If Not clLog Is Nothing Then
-				ScriveErrore(idProc, "ERRORE in LeggeQuery:" & Sql & " -> " & ex.Message, clLog)
-			End If
-		End Try
+				If Not clLog Is Nothing Then
+					ScriveErrore(idProc, "ERRORE in LeggeQuery:" & Sql & " -> " & ex.Message, clLog)
+				End If
+			End Try
+		Loop
 
 		ChiudeDB(AperturaManuale)
 

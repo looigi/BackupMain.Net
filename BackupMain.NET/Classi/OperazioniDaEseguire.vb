@@ -56,38 +56,42 @@
 				'opFiles.ScriveLogServizio(idProc, Sql)
 
 				Rec = DB.LeggeQuery(0, Sql, Nothing)
-				Do Until Rec.Eof
-					qId += 1
-					ReDim Preserve idProceduraDaEseguire(qId)
-					idProceduraDaEseguire(qId) = Rec("NomeProcedura").Value
+				If Not Rec Is Nothing Then
+					Do Until Rec.EOF
+						qId += 1
+						ReDim Preserve idProceduraDaEseguire(qId)
+						idProceduraDaEseguire(qId) = Rec("NomeProcedura").Value
 
-					Rec.MoveNext()
-				Loop
-				Rec.Close()
+						Rec.MoveNext()
+					Loop
+					Rec.Close()
 
-				' Controlla se esistono backup per l'ora e il giorno del mese
-				Sql = "Select B.NomeProcedura From Schedulazioni A Left Join NomiProcedure B On A.idProc=B.idProc " &
-					"Where " &
-					"TipoBackup='M' And " &
-					"Instr(Valore1, '" & TornaNumeroGiornoMese() & ";')>0 And " &
-					"Orario='" & TornaOrario() & "'"
+					' Controlla se esistono backup per l'ora e il giorno del mese
+					Sql = "Select B.NomeProcedura From Schedulazioni A Left Join NomiProcedure B On A.idProc=B.idProc " &
+						"Where " &
+						"TipoBackup='M' And " &
+						"Instr(Valore1, '" & TornaNumeroGiornoMese() & ";')>0 And " &
+						"Orario='" & TornaOrario() & "'"
 
-				'opFiles.ScriveLogServizio(idProc, "Controlla se esistono backup per l'ora e il giorno del mese")
-				'opFiles.ScriveLogServizio(idProc, Sql)
+					'opFiles.ScriveLogServizio(idProc, "Controlla se esistono backup per l'ora e il giorno del mese")
+					'opFiles.ScriveLogServizio(idProc, Sql)
 
-				Rec = DB.LeggeQuery(0, Sql, Nothing)
-				Do Until Rec.Eof
-					qId += 1
-					ReDim Preserve idProceduraDaEseguire(qId)
-					idProceduraDaEseguire(qId) = Rec("NomeProcedura").Value
+					Rec = DB.LeggeQuery(0, Sql, Nothing)
+					If Not Rec Is Nothing Then
+						Do Until Rec.EOF
+							qId += 1
+							ReDim Preserve idProceduraDaEseguire(qId)
+							idProceduraDaEseguire(qId) = Rec("NomeProcedura").Value
 
-					Rec.MoveNext()
-				Loop
-				Rec.Close()
+							Rec.MoveNext()
+						Loop
+						Rec.Close()
+					End If
+				End If
 
 				DB.ChiudeDB(True)
-			Else
-				opFiles.ScriveLogServizio(1, "ERRORE SU APERTURA DB")
+				Else
+					opFiles.ScriveLogServizio(1, "ERRORE SU APERTURA DB")
 			End If
 			DB = Nothing
 		Catch ex As Exception
