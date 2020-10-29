@@ -332,9 +332,9 @@ Public Class OperazioniSuFile
         Dim qCartelle As Long = -1
         Dim LeggiCartelle As Boolean = False
         Dim log As StringBuilder = New StringBuilder
-		Dim NomeFileUltimaOperazione As String = Application.StartupPath & "\UltimaOperazione.txt"
+        Dim NomeFileUltimaOperazione As String = Application.StartupPath & "\UltimaOperazione.txt"
 
-		Select Case Operazione
+        Select Case Operazione
             Case TipoOperazione.Copia
                 LeggiCartelle = True
             Case TipoOperazione.Spostamento
@@ -392,17 +392,17 @@ Public Class OperazioniSuFile
                         ' ----------------------------------------------------------------------------------------------
 
                     Case TipoOperazione.SincroniaIntelligente
-						log = Oper.Sincronizza(idProc, Progressivo, Origine, Destinazione, Filtro, lblOperazione, lblContatore, True, ModalitaServizio,
-											   instance, clLog, ModalitaEsecuzioneAutomatica, PercorsoDBTemp, Gf, NomeFileUltimaOperazione)
+                        log = Oper.Sincronizza(idProc, Progressivo, Origine, Destinazione, Filtro, lblOperazione, lblContatore, True, ModalitaServizio,
+                                               instance, clLog, ModalitaEsecuzioneAutomatica, PercorsoDBTemp, Gf, NomeFileUltimaOperazione)
 
-						' ----------------------------------------------------------------------------------------------
+                        ' ----------------------------------------------------------------------------------------------
 
-					Case TipoOperazione.Sincronizzazione
-						log = Oper.Sincronizza(idProc, Progressivo, Origine, Destinazione, Filtro, lblOperazione, lblContatore, False, ModalitaServizio,
-											   instance, clLog, ModalitaEsecuzioneAutomatica, PercorsoDBTemp, Gf, NomeFileUltimaOperazione)
+                    Case TipoOperazione.Sincronizzazione
+                        log = Oper.Sincronizza(idProc, Progressivo, Origine, Destinazione, Filtro, lblOperazione, lblContatore, False, ModalitaServizio,
+                                               instance, clLog, ModalitaEsecuzioneAutomatica, PercorsoDBTemp, Gf, NomeFileUltimaOperazione)
 
-						' ----------------------------------------------------------------------------------------------
-					Case TipoOperazione.RiavvioPC
+                        ' ----------------------------------------------------------------------------------------------
+                    Case TipoOperazione.RiavvioPC
                         log = Oper.RiavvioPC(idProc, clLog)
 
                         ' ----------------------------------------------------------------------------------------------
@@ -427,7 +427,7 @@ Public Class OperazioniSuFile
 
                         ' ----------------------------------------------------------------------------------------------
                     Case TipoOperazione.Zip
-                        log = Oper.EsegueZip(idProc, Origine, Destinazione, lblOperazione, lblContatore, ModalitaServizio, instance, clLog)
+                        log = Oper.EsegueZip(idProc, Origine, Destinazione, lblOperazione, lblContatore, ModalitaServizio, instance, clLog, Filtro)
 
                         ' ----------------------------------------------------------------------------------------------
                     Case TipoOperazione.ListaFiles
@@ -464,9 +464,9 @@ Public Class OperazioniSuFile
             End If
             Application.DoEvents()
 
-			ScriviUltimaOperazione(Gf, Operazione, Origine, Destinazione, NomeFileUltimaOperazione)
+            ScriviUltimaOperazione(Gf, Operazione, Origine, Destinazione, NomeFileUltimaOperazione)
 
-			mud = Nothing
+            mud = Nothing
             Oper = Nothing
             Gf = Nothing
         End If
@@ -474,7 +474,7 @@ Public Class OperazioniSuFile
         Return log
     End Function
 
-	Private Sub ScriviUltimaOperazione(Gf As GestioneFilesDirectory, Operazione As Integer, Origine As String, Destinazione As String, NomeFileUltimaOperazione As String)
+    Private Sub ScriviUltimaOperazione(Gf As GestioneFilesDirectory, Operazione As Integer, Origine As String, Destinazione As String, NomeFileUltimaOperazione As String)
 		Dim Cosa As String = Operazione & ";" & Origine.Replace(";", "***PV***") & ";" & Destinazione.Replace(";", "***PV***") & ";"
 		Gf.EliminaFileFisico(NomeFileUltimaOperazione)
 		Gf.CreaAggiornaFile(NomeFileUltimaOperazione, cosa)

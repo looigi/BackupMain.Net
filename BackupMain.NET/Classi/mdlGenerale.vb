@@ -6,6 +6,7 @@ Imports Ionic.Zip
 Imports OperazioniSuFile
 
 Module mdlGenerale
+	Public UltimaOperazione As String = ""
 	Public NotifyIcon1 As NotifyIcon = New NotifyIcon
 	Public UtenzaMail As String
 	Public PasswordMail As String

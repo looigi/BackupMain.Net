@@ -68,6 +68,8 @@ Public Class frmEsecuzione
 		Timer1.Enabled = True
 		InEsecuzione = True
 
+		UltimaOperazione = ""
+
 		'If ModalitaEsecuzioneAutomatica Then
 		'End If
 
@@ -321,7 +323,9 @@ Public Class frmEsecuzione
         Blocca = True
         Skippa = True
 
-        If opeFileGlobale Is Nothing = False Then
+		UltimaOperazione = ""
+
+		If opeFileGlobale Is Nothing = False Then
             cmdPausa.Enabled = False
             cmdStop.Enabled = False
             cmdSkip.Enabled = False

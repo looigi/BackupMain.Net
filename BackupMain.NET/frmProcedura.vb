@@ -549,6 +549,8 @@ Public Class frmProcedura
 
 		lblTitOrig.Text = "Origine"
 		lblTitDest.Text = "Destinazione"
+		lblTitFiltro.Text = "Parametri"
+
 		cmdSopraSotto.Visible = True
 
 		Select Case Cosa
@@ -597,8 +599,9 @@ Public Class frmProcedura
 
 				cmdSopraSotto.Visible = False
 			Case "Sincronizza", "Sincronia Intelligente", "Zip", "Lista Files"
-				lblTitFiltro.Visible = False
-				txtFiltro.Visible = False
+				lblTitFiltro.Text = "Esclusioni"
+				lblTitFiltro.Visible = True
+				txtFiltro.Visible = True
 
 				chkSottodirectory.Visible = False
 				chkSovrascrivi.Visible = False

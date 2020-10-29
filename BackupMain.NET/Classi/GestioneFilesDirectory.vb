@@ -213,9 +213,9 @@ Public Class GestioneFilesDirectory
 					If SovraScrittura = False Then
 						NomeFileDestinazione = NomeFileEsistente(NomeFileDestinazione)
 					Else
-						Dim flO As Integer = FileLen(NomeFileOrigine)
-						Dim flD As Integer = FileLen(NomeFileDestinazione)
-						Dim duaO As Date = FileDateTime(NomeFileOrigine)
+                        Dim flO As Long = FileLen(NomeFileOrigine)
+                        Dim flD As Long = FileLen(NomeFileDestinazione)
+                        Dim duaO As Date = FileDateTime(NomeFileOrigine)
 						Dim duaD As Date = FileDateTime(NomeFileDestinazione)
 
 						Dim diff As Integer = Math.Abs(DateDiff(DateInterval.Second, duaO, duaD))

@@ -9,9 +9,9 @@ Public Class OperazioniSuFileDettagli
     Private FileDestinazione As String
     Private gf As GestioneFilesDirectory
     Private log As StringBuilder = New StringBuilder
-    Private LunghezzaMassimaScritte As Integer = 70
+	Private LunghezzaMassimaScritte As Integer = 70
 
-    Sub New()
+	Sub New()
         gf = New GestioneFilesDirectory
     End Sub
 
@@ -304,16 +304,16 @@ Public Class OperazioniSuFileDettagli
 			End If
 		End If
 
-		Dim Ultime As String = GF.LeggeFileIntero(NomeFileUtlimaOperazione)
-		Dim CampiUltimeOperazioni() As String
-		If Ultime <> "" Then
-			CampiUltimeOperazioni = Ultime.Split(";")
-		Else
-			ReDim CampiUltimeOperazioni(2)
-			CampiUltimeOperazioni(0) = "0"
-			CampiUltimeOperazioni(1) = Now
-			CampiUltimeOperazioni(2) = Now
-		End If
+		'Dim Ultime As String = GF.LeggeFileIntero(NomeFileUtlimaOperazione)
+		'Dim CampiUltimeOperazioni() As String
+		'If Ultime <> "" Then
+		'	CampiUltimeOperazioni = Ultime.Split(";")
+		'Else
+		'	ReDim CampiUltimeOperazioni(2)
+		'	CampiUltimeOperazioni(0) = "0"
+		'	CampiUltimeOperazioni(1) = Now
+		'	CampiUltimeOperazioni(2) = Now
+		'End If
 
 		If Intelligente Then
 			ScriveLog(idProc, "SINCRONIZZAZIONE INTELLIGENTE DIRECTORY: " & Origine & "->" & Destinazione, clLog)
@@ -360,17 +360,21 @@ Public Class OperazioniSuFileDettagli
 			Dim EsegueLettura As Boolean
 
 			' Lettura origine
-			'If Origine <> CampiUltimeOperazioni(1) Then
-			EsegueLettura = True
-			ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Lettura directory di origine " & vbCrLf & Origine, " ", ModalitaServizio, clLog)
-			'Else
-			'	EsegueLettura = False
-			'	ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Directory di origine " & vbCrLf & Origine & " già letta", " ", ModalitaServizio, clLog)
-			'End If
+			If Origine <> UltimaOperazione Then
+				UltimaOperazione = Origine
+				EsegueLettura = True
+				ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Lettura directory di origine " & vbCrLf & Origine, " ", ModalitaServizio, clLog)
+			Else
+				EsegueLettura = False
+				ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Directory di origine " & vbCrLf & Origine & " già letta", " ", ModalitaServizio, clLog)
+			End If
 
 			If MetteInPausa Then
 				MetteInPausaLaRoutine()
 			End If
+
+			If Filtro.Trim <> "" And Not Filtro.Trim.EndsWith(";") Then Filtro = Filtro & ";"
+			Dim sFiltro() As String = Filtro.Split(";")
 
 			If Not BloccaTutto And EsegueLettura Then
 				GF.ScansionaDirectorySingola(Origine, instance, Filtro, lblOperazione, False)
@@ -389,6 +393,31 @@ Public Class OperazioniSuFileDettagli
 
 					CartelleOrig = GF.RitornaDirectoryRilevate
 					qCartelleOrig = GF.RitornaQuanteDirectoryRilevate
+
+					Dim filetti2 As New List(Of String)
+					' filetti2.Add("")
+
+					For i As Long = 1 To qFiletti
+						Dim Ok As Boolean = True
+
+						If Filtro <> "" Then
+							For Each s As String In sFiltro
+								If s <> "" Then
+									If Filetti(i).ToUpper.Contains(s.ToUpper.Trim) Then
+										Ok = False
+										Exit For
+									End If
+								End If
+							Next
+						End If
+
+						If Ok Then
+							filetti2.Add(Filetti(i))
+						End If
+					Next
+
+					Filetti = filetti2.ToArray
+					qFiletti = Filetti.Length - 1
 
 					Sql = "Delete * From UltimeDirOrig"
 					DB.EsegueSql(idProc, Sql, clLog)
@@ -446,47 +475,52 @@ Public Class OperazioniSuFileDettagli
 					End If
 
 					Sql = ""
+
 					For i As Long = 0 To qFiletti
 						If Filetti(i) <> "" Then
-							Try
-								Datella = DataFiletti(i)
-								DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
-							Catch ex As Exception
-								DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
-							End Try
+							Dim Ok As Boolean = True
 
-							Sql &= "Select " &
-								"'" & Filetti(i).Replace("'", "''").Replace(Origine & Altro, "") & "' As File, " &
-								" " & DimensioneFiletti(i) & " As Dimensioni, " &
-								"'" & DatellaFile & "' As Dataora From VersioneDB " &
-								" Union All "
-							' DB.EsegueSql(idProc, Sql, clLog)
+							If Ok Then
+								Try
+									Datella = DataFiletti(i)
+									DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
+								Catch ex As Exception
+									DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+								End Try
 
-							If IsNothing(lblContatore) = False Then
-								If i / 20 = Int(i / 20) Then
-									'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
-									If instance.InvokeRequired Then
-										instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
-									Else
-										lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
+								Sql &= "Select " &
+									"'" & Filetti(i).Replace("'", "''").Replace(Origine & Altro, "") & "' As File, " &
+									" " & DimensioneFiletti(i) & " As Dimensioni, " &
+									"'" & DatellaFile & "' As Dataora From VersioneDB " &
+									" Union All "
+								' DB.EsegueSql(idProc, Sql, clLog)
+
+								If IsNothing(lblContatore) = False Then
+									If i / 20 = Int(i / 20) Then
+										'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
+										If instance.InvokeRequired Then
+											instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
+										Else
+											lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
+										End If
+
+										Sql = Mid(Sql, 1, Sql.Length - 11)
+										Sql = "Insert Into FilesOrigine Select * From (" & Sql & ") As AA"
+										DB.EsegueSql(idProc, Sql, clLog)
+										Sql = ""
 									End If
-
-									Sql = Mid(Sql, 1, Sql.Length - 11)
-									Sql = "Insert Into FilesOrigine Select * From (" & Sql & ") As AA"
-									DB.EsegueSql(idProc, Sql, clLog)
-									Sql = ""
 								End If
-							End If
 
-							If MetteInPausa Then
-								MetteInPausaLaRoutine()
-							End If
+								If MetteInPausa Then
+									MetteInPausaLaRoutine()
+								End If
 
-							If BloccaTutto Then
-								Exit For
-							End If
+								If BloccaTutto Then
+									Exit For
+								End If
 
-							Application.DoEvents()
+								Application.DoEvents()
+							End If
 						End If
 					Next
 					If Sql <> "" Then
@@ -607,65 +641,78 @@ Public Class OperazioniSuFileDettagli
 								Sql = ""
 								For i As Long = 0 To qFiletti
 									If Filetti(i) <> "" Then
-										Try
-											Datella = DataFiletti(i)
-											DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
-										Catch ex As Exception
-											DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
-										End Try
+										Dim Ok As Boolean = True
 
-										If Intelligente Then
-											Sql = "Insert Into FileDestinazioneIntelligente Values (" &
-												" " & idProc & ", " &
-												" " & Progressivo & ", " &
-												" " & (i + 1) & ", " &
-												"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "', " &
-												" " & DimensioneFiletti(i) & ", " &
-												"'" & DatellaFile & "' " &
-												")"
-											DB.EsegueSql(idProc, Sql, clLog)
-										Else
-											Sql &= "Select " &
-												"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "' As File, " &
-												" " & DimensioneFiletti(i) & " As Dimensioni, " &
-												"'" & DatellaFile & "' As DataOra From VersioneDB " &
-												" Union All "
+										'If Filtro <> "" Then
+										'	For Each s As String In sFiltro
+										'		If Filetti(i).ToUpper.Contains(Filtro.ToUpper.Trim) Then
+										'			Ok = False
+										'			Exit For
+										'		End If
+										'	Next
+										'End If
 
-											'Sql = "Insert Into FilesDestinazione Values (" &
-											'	"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "', " &
-											'	" " & DimensioneFiletti(i) & ", " &
-											'	"'" & DatellaFile & "' " &
-											'	")"
-										End If
-										Massimo = i + 1
+										If Ok Then
+											Try
+												Datella = DataFiletti(i)
+												DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
+											Catch ex As Exception
+												DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+											End Try
 
-										If IsNothing(lblContatore) = False Then
-											If i / 20 = Int(i / 20) Then
-												'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
-												If instance.InvokeRequired Then
-													instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
-												Else
-													lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
-												End If
+											If Intelligente Then
+												Sql = "Insert Into FileDestinazioneIntelligente Values (" &
+													" " & idProc & ", " &
+													" " & Progressivo & ", " &
+													" " & (i + 1) & ", " &
+													"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "', " &
+													" " & DimensioneFiletti(i) & ", " &
+													"'" & DatellaFile & "' " &
+													")"
+												DB.EsegueSql(idProc, Sql, clLog)
+											Else
+												Sql &= "Select " &
+													"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "' As File, " &
+													" " & DimensioneFiletti(i) & " As Dimensioni, " &
+													"'" & DatellaFile & "' As DataOra From VersioneDB " &
+													" Union All "
 
-												If Not Intelligente Then
-													Sql = Mid(Sql, 1, Sql.Length - 11)
-													Sql = "Insert Into FilesDestinazione Select * From (" & Sql & ") As AA"
-													DB.EsegueSql(idProc, Sql, clLog)
-													Sql = ""
+												'Sql = "Insert Into FilesDestinazione Values (" &
+												'	"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "', " &
+												'	" " & DimensioneFiletti(i) & ", " &
+												'	"'" & DatellaFile & "' " &
+												'	")"
+											End If
+											Massimo = i + 1
+
+											If IsNothing(lblContatore) = False Then
+												If i / 20 = Int(i / 20) Then
+													'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
+													If instance.InvokeRequired Then
+														instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
+													Else
+														lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
+													End If
+
+													If Not Intelligente Then
+														Sql = Mid(Sql, 1, Sql.Length - 11)
+														Sql = "Insert Into FilesDestinazione Select * From (" & Sql & ") As AA"
+														DB.EsegueSql(idProc, Sql, clLog)
+														Sql = ""
+													End If
 												End If
 											End If
-										End If
 
-										If MetteInPausa Then
-											MetteInPausaLaRoutine()
-										End If
+											If MetteInPausa Then
+												MetteInPausaLaRoutine()
+											End If
 
-										If BloccaTutto Then
-											Exit For
-										End If
+											If BloccaTutto Then
+												Exit For
+											End If
 
-										Application.DoEvents()
+											Application.DoEvents()
+										End If
 									End If
 								Next
 								If Not Intelligente And Sql <> "" Then
@@ -775,7 +822,21 @@ Public Class OperazioniSuFileDettagli
 							Try
 								FileOrigine = Origine & "\" & Rec2("File").Value
 								FileDestinazione = Destinazione & "\" & Rec2("File").Value
-								If Not File.Exists(FileOrigine) And File.Exists(FileDestinazione) Then
+
+								Dim Ok As Boolean = True
+
+								If Filtro <> "" Then
+									For Each s As String In sFiltro
+										If s <> "" Then
+											If FileOrigine.ToUpper.Contains(s.ToUpper.Trim) Then
+												Ok = False
+												Exit For
+											End If
+										End If
+									Next
+								End If
+
+								If (Not File.Exists(FileOrigine) And File.Exists(FileDestinazione)) Or (Ok = False And File.Exists(FileDestinazione)) Then
 									FilesDaElaborare.Add(Rec2("File").Value)
 									q += 1
 								End If
@@ -996,10 +1057,12 @@ Public Class OperazioniSuFileDettagli
 									If cd <> "" Then
 										If i / 20 = Int(i / 20) Then
 											ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Scrittura tabella origine", i & "/" & qCartelleOrig, ModalitaServizio, clLog)
-											Sql = Mid(Sql, 1, Sql.Length - 11)
-											Sql = "Insert Into DirectOrig Select * From (" & Sql & ") As AA"
-											DB.EsegueSql(idProc, Sql, clLog)
-											Sql = ""
+											If Sql <> "" Then
+												Sql = Mid(Sql, 1, Sql.Length - 11)
+												Sql = "Insert Into DirectOrig Select * From (" & Sql & ") As AA"
+												DB.EsegueSql(idProc, Sql, clLog)
+												Sql = ""
+											End If
 										End If
 										cd = cd.Replace(Origine, "")
 										If cd <> "" Then
@@ -1404,107 +1467,135 @@ Public Class OperazioniSuFileDettagli
 	End Sub
 
 	Public Function EsegueZip(idProc As Integer, Origine As String, Destinazione As String, lblOperazione As Label, lblContatore As Label, ModalitaServizio As Boolean,
-                              instance As Form, clLog As LogCasareccio.LogCasareccio.Logger) As StringBuilder
-        ScriveLog(idProc, "ZIP FILES: " & Origine & "->" & Destinazione, clLog)
+							  instance As Form, clLog As LogCasareccio.LogCasareccio.Logger, Filtro As String) As StringBuilder
+		ScriveLog(idProc, "ZIP FILES: " & Origine & "->" & Destinazione, clLog)
 
-        Dim PathUlteriore As String = ""
+		Dim PathUlteriore As String = ""
 
-        log = New StringBuilder
+		log = New StringBuilder
 
-        Try
-            gf.ScansionaDirectorySingola(Origine, instance, "", lblOperazione, False)
+		Try
+			gf.ScansionaDirectorySingola(Origine, instance, "", lblOperazione, False)
 
-            'lblOperazione.Text = ""
-            'Application.DoEvents()
+			'lblOperazione.Text = ""
+			'Application.DoEvents()
 
-            Dim Filetti() As String = gf.RitornaFilesRilevati
-            Dim qFiletti As Long = gf.RitornaQuantiFilesRilevati
+			Dim Filetti() As String = gf.RitornaFilesRilevati
+			Dim qFiletti As Long = gf.RitornaQuantiFilesRilevati
 
-            Try
-                File.Delete(Destinazione)
-            Catch ex As Exception
+			If Filtro.Trim <> "" And Not Filtro.Trim.EndsWith(";") Then Filtro = Filtro & ";"
+			Dim sFiltro() As String = Filtro.Split(";")
 
-            End Try
+			Dim filetti2 As New List(Of String)
+			' filetti2.Add("")
 
-            Try
-                ' Using zip As New ZipFile()
-                Dim zip As New ZipFile()
-                Dim FileZippante As ZipEntry
+			For i As Long = 1 To qFiletti
+				Dim Ok As Boolean = True
 
-                'If qFiletti > 60000 Then
-                '    zip.UseZip64WhenSaving = Zip64Option.Always
-                'End If
-                zip.ParallelDeflateThreshold = -1
+				If Filtro <> "" Then
+					For Each s As String In sFiltro
+						If s <> "" Then
+							If Filetti(i).ToUpper.Contains(s.ToUpper.Trim) Then
+								Ok = False
+								Exit For
+							End If
+						End If
+					Next
+				End If
 
-                Dim t As New ThreadAttesaOperazione
-                t.EsegueControllo(instance, idProc, ModalitaServizio, clLog, Destinazione, log, lblOperazione, lblContatore, "Creazione file zip", zip)
+				If Ok Then
+					filetti2.Add(Filetti(i))
+				End If
+			Next
 
-                ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Aggiunta file a zip", " ", ModalitaServizio, clLog)
+			Filetti = filetti2.ToArray
+			qFiletti = Filetti.Length - 1
 
-                Dim Dest2 As String = Destinazione
-                Dim Progressivo As Integer = 0
-                Dim i2 As Long = 0
+			Try
+				File.Delete(Destinazione)
+			Catch ex As Exception
 
-                For i As Long = 1 To qFiletti
-                    i2 += 1
-                    If (i2 / 100 = Int(i2 / 100)) Then
-                        ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Aggiunta file a zip: " & gf.FormattaNumero ( i,False) & " / " & gf.FormattaNumero (qfiletti,False), " ", ModalitaServizio, clLog)
-                    End If
-                    FileZippante = zip.AddFile(Filetti(i))
+			End Try
 
-                    If i2 > 32000 Then
-                        i2 = 0
-                        ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Creazione zip " & Origine, " ", ModalitaServizio, clLog)
+			Try
+				' Using zip As New ZipFile()
+				Dim zip As New ZipFile()
+				Dim FileZippante As ZipEntry
 
-                        Try
-                            File.Delete(dest2)
-                        Catch ex As Exception
+				'If qFiletti > 60000 Then
+				'    zip.UseZip64WhenSaving = Zip64Option.Always
+				'End If
+				zip.ParallelDeflateThreshold = -1
 
-                        End Try
+				Dim t As New ThreadAttesaOperazione
+				t.EsegueControllo(instance, idProc, ModalitaServizio, clLog, Destinazione, log, lblOperazione, lblContatore, "Creazione file zip", zip)
 
-                        zip.Save(Dest2)
+				ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Aggiunta file a zip", " ", ModalitaServizio, clLog)
 
-                        Progressivo += 1
-                        Dim este As String = gf.TornaEstensioneFileDaPath(Destinazione)
+				Dim Dest2 As String = Destinazione
+				Dim Progressivo As Integer = 0
+				Dim i2 As Long = 0
 
-                        Dest2 = Destinazione.Replace(este, "") & "." & Format(Progressivo, "000") & este
+				For i As Long = 1 To qFiletti
+					i2 += 1
+					If (i2 / 100 = Int(i2 / 100)) Then
+						ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Aggiunta file a zip: " & gf.FormattaNumero(i, False) & " / " & gf.FormattaNumero(qFiletti, False), " ", ModalitaServizio, clLog)
+					End If
+					FileZippante = zip.AddFile(Filetti(i))
 
-                        t.Blocca(lblOperazione)
+					If i2 > 32000 Then
+						i2 = 0
+						ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Creazione zip " & Origine, " ", ModalitaServizio, clLog)
 
-                        zip = New ZipFile()
-                        FileZippante = New ZipEntry
+						Try
+							File.Delete(Dest2)
+						Catch ex As Exception
 
-                        t = New ThreadAttesaOperazione
-                        t.EsegueControllo(instance, idProc, ModalitaServizio, clLog, Dest2, log, lblOperazione, lblContatore, "Creazione file zip", zip)
-                    End If
+						End Try
 
-                    If BloccaTutto Then
-                        Exit For
-                    End If
-                Next
+						zip.Save(Dest2)
 
-                If Not BloccaTutto Then
-                    ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Creazione zip " & Origine, " ", ModalitaServizio, clLog)
+						Progressivo += 1
+						Dim este As String = gf.TornaEstensioneFileDaPath(Destinazione)
 
-                    zip.Save(Dest2)
-                End If
+						Dest2 = Destinazione.Replace(este, "") & "." & Format(Progressivo, "000") & este
 
-                t.Blocca(lblOperazione)
+						t.Blocca(lblOperazione)
 
-                FileZippante = Nothing
-                zip = Nothing
-                ' End Using
-            Catch ex1 As System.Exception
-                ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Errore su zip: " + ex1.Message, " ", ModalitaServizio, clLog)
-            End Try
-        Catch ex As Exception
-            ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "ERRORE: " & ex.Message, " ", ModalitaServizio, clLog)
-        End Try
+						zip = New ZipFile()
+						FileZippante = New ZipEntry
 
-        Return log
-    End Function
+						t = New ThreadAttesaOperazione
+						t.EsegueControllo(instance, idProc, ModalitaServizio, clLog, Dest2, log, lblOperazione, lblContatore, "Creazione file zip", zip)
+					End If
 
-    Public Function ListaFiles(idProc As Integer, Origine As String, Destinazione As String, lblOperazione As Label, lblContatore As Label, ModalitaServizio As Boolean,
+					If BloccaTutto Then
+						Exit For
+					End If
+				Next
+
+				If Not BloccaTutto Then
+					ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Creazione zip " & Origine, " ", ModalitaServizio, clLog)
+
+					zip.Save(Dest2)
+				End If
+
+				t.Blocca(lblOperazione)
+
+				FileZippante = Nothing
+				zip = Nothing
+				' End Using
+			Catch ex1 As System.Exception
+				ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Errore su zip: " + ex1.Message, " ", ModalitaServizio, clLog)
+			End Try
+		Catch ex As Exception
+			ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "ERRORE: " & ex.Message, " ", ModalitaServizio, clLog)
+		End Try
+
+		Return log
+	End Function
+
+	Public Function ListaFiles(idProc As Integer, Origine As String, Destinazione As String, lblOperazione As Label, lblContatore As Label, ModalitaServizio As Boolean,
                                instance As Form, clLog As LogCasareccio.LogCasareccio.Logger) As StringBuilder
         ScriveLog(idProc, "LISTA FILES: " & Origine & "->" & Destinazione, clLog)
 
