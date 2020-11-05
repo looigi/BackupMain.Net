@@ -215,10 +215,13 @@ Public Class GestioneFilesDirectory
 					Else
                         Dim flO As Long = FileLen(NomeFileOrigine)
                         Dim flD As Long = FileLen(NomeFileDestinazione)
-                        Dim duaO As Date = FileDateTime(NomeFileOrigine)
-						Dim duaD As Date = FileDateTime(NomeFileDestinazione)
 
-						Dim diff As Integer = Math.Abs(DateDiff(DateInterval.Second, duaO, duaD))
+                        Dim fl As New FileInfo(NomeFileOrigine)
+                        Dim duaO As Date = fl.LastWriteTime ' DataFiletti(i)
+                        Dim fl2 As New FileInfo(NomeFileDestinazione)
+                        Dim duaD As Date = fl.LastWriteTime ' DataFiletti(i)
+
+                        Dim diff As Integer = Math.Abs(DateDiff(DateInterval.Second, duaO, duaD))
 						If flO = flD And diff < 60 Then
 							Ritorno = "SKIPPED"
 							Ok = False

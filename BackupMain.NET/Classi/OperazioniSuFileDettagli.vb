@@ -337,8 +337,8 @@ Public Class OperazioniSuFileDettagli
 			Dim LeggiFiles As Boolean
 
 			Dim Filetti() As String = {}
-			Dim DimensioneFiletti() As Long = {}
-			Dim DataFiletti() As Date = {}
+			'Dim DimensioneFiletti() As Long = {}
+			'Dim DataFiletti() As Date = {}
 			Dim qFiletti As Long
 			Dim CartelleOrig() As String = {}
 			Dim qCartelleOrig As Long
@@ -387,8 +387,8 @@ Public Class OperazioniSuFileDettagli
 
 				If Not BloccaTutto Then
 					Filetti = GF.RitornaFilesRilevati
-					DimensioneFiletti = GF.RitornaDimensioneFilesRilevati
-					DataFiletti = GF.RitornaDataFilesRilevati
+					'DimensioneFiletti = GF.RitornaDimensioneFilesRilevati
+					'DataFiletti = GF.RitornaDataFilesRilevati
 					qFiletti = GF.RitornaQuantiFilesRilevati
 
 					CartelleOrig = GF.RitornaDirectoryRilevate
@@ -481,47 +481,65 @@ Public Class OperazioniSuFileDettagli
 							Dim Ok As Boolean = True
 
 							If Ok Then
+								Dim fl As FileInfo = Nothing
+								Dim dime As Long = -1
+								DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+
 								Try
-									Datella = DataFiletti(i)
-									DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
+									fl = New FileInfo(Filetti(i))
 								Catch ex As Exception
-									DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+
 								End Try
+
+								If Not fl Is Nothing Then
+									Try
+										Datella = fl.LastWriteTime ' DataFiletti(i)
+										DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
+									Catch ex As Exception
+										' DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+									End Try
+
+									Try
+										dime = fl.Length ' FileLen(Filetti(i))
+									Catch ex As Exception
+										'dime = -1
+									End Try
+								End If
 
 								Sql &= "Select " &
 									"'" & Filetti(i).Replace("'", "''").Replace(Origine & Altro, "") & "' As File, " &
-									" " & DimensioneFiletti(i) & " As Dimensioni, " &
+									" " & dime & " As Dimensioni, " &
 									"'" & DatellaFile & "' As Dataora From VersioneDB " &
 									" Union All "
-								' DB.EsegueSql(idProc, Sql, clLog)
+									' DB.EsegueSql(idProc, Sql, clLog)
 
-								If IsNothing(lblContatore) = False Then
-									If i / 20 = Int(i / 20) Then
-										'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
-										If instance.InvokeRequired Then
-											instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
-										Else
-											lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
+									If IsNothing(lblContatore) = False Then
+										If i / 20 = Int(i / 20) Then
+											'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
+											If instance.InvokeRequired Then
+												instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
+											Else
+												lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
+											End If
+
+											Sql = Mid(Sql, 1, Sql.Length - 11)
+											Sql = "Insert Into FilesOrigine Select * From (" & Sql & ") As AA"
+											DB.EsegueSql(idProc, Sql, clLog)
+											Sql = ""
 										End If
-
-										Sql = Mid(Sql, 1, Sql.Length - 11)
-										Sql = "Insert Into FilesOrigine Select * From (" & Sql & ") As AA"
-										DB.EsegueSql(idProc, Sql, clLog)
-										Sql = ""
 									End If
-								End If
 
-								If MetteInPausa Then
-									MetteInPausaLaRoutine()
-								End If
+									If MetteInPausa Then
+										MetteInPausaLaRoutine()
+									End If
 
-								If BloccaTutto Then
-									Exit For
-								End If
+									If BloccaTutto Then
+										Exit For
+									End If
 
-								Application.DoEvents()
+									Application.DoEvents()
+								End If
 							End If
-						End If
 					Next
 					If Sql <> "" Then
 						Sql = Mid(Sql, 1, Sql.Length - 11)
@@ -545,8 +563,8 @@ Public Class OperazioniSuFileDettagli
 				End If
 
 				ReDim Filetti(0)
-				ReDim DimensioneFiletti(0)
-				ReDim DataFiletti(0)
+				'ReDim DimensioneFiletti(0)
+				'ReDim DataFiletti(0)
 
 				If Not BloccaTutto Then
 					' Lettura Destinazione
@@ -607,8 +625,8 @@ Public Class OperazioniSuFileDettagli
 
 							If Not BloccaTutto Then
 								Filetti = GF.RitornaFilesRilevati
-								DimensioneFiletti = GF.RitornaDimensioneFilesRilevati
-								DataFiletti = GF.RitornaDataFilesRilevati
+								'DimensioneFiletti = GF.RitornaDimensioneFilesRilevati
+								'DataFiletti = GF.RitornaDataFilesRilevati
 								qFiletti = GF.RitornaQuantiFilesRilevati
 
 								CartelleDest = GF.RitornaDirectoryRilevate
@@ -653,67 +671,85 @@ Public Class OperazioniSuFileDettagli
 										'End If
 
 										If Ok Then
+											Dim fl As FileInfo = Nothing
+											DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+											Dim dime As Long = -1
+
 											Try
-												Datella = DataFiletti(i)
-												DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
+												fl = New FileInfo(Filetti(i))
 											Catch ex As Exception
-												DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+
 											End Try
 
+											If Not fl Is Nothing Then
+												Try
+													Datella = fl.LastWriteTime ' DataFiletti(i)
+													DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
+												Catch ex As Exception
+													' DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+												End Try
+
+												Try
+													dime = fl.Length ' FileLen(Filetti(i))
+												Catch ex As Exception
+													' dime = -1
+												End Try
+											End If
+
 											If Intelligente Then
-												Sql = "Insert Into FileDestinazioneIntelligente Values (" &
+													Sql = "Insert Into FileDestinazioneIntelligente Values (" &
 													" " & idProc & ", " &
 													" " & Progressivo & ", " &
 													" " & (i + 1) & ", " &
 													"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "', " &
-													" " & DimensioneFiletti(i) & ", " &
+													" " & dime & ", " &
 													"'" & DatellaFile & "' " &
 													")"
-												DB.EsegueSql(idProc, Sql, clLog)
-											Else
-												Sql &= "Select " &
+													DB.EsegueSql(idProc, Sql, clLog)
+												Else
+													Sql &= "Select " &
 													"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "' As File, " &
-													" " & DimensioneFiletti(i) & " As Dimensioni, " &
+													" " & dime & " As Dimensioni, " &
 													"'" & DatellaFile & "' As DataOra From VersioneDB " &
 													" Union All "
 
-												'Sql = "Insert Into FilesDestinazione Values (" &
-												'	"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "', " &
-												'	" " & DimensioneFiletti(i) & ", " &
-												'	"'" & DatellaFile & "' " &
-												'	")"
-											End If
-											Massimo = i + 1
+													'Sql = "Insert Into FilesDestinazione Values (" &
+													'	"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "', " &
+													'	" " & DimensioneFiletti(i) & ", " &
+													'	"'" & DatellaFile & "' " &
+													'	")"
+												End If
+												Massimo = i + 1
 
-											If IsNothing(lblContatore) = False Then
-												If i / 20 = Int(i / 20) Then
-													'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
-													If instance.InvokeRequired Then
-														instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
-													Else
-														lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
-													End If
+												If IsNothing(lblContatore) = False Then
+													If i / 20 = Int(i / 20) Then
+														'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
+														If instance.InvokeRequired Then
+															instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
+														Else
+															lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
+														End If
 
-													If Not Intelligente Then
-														Sql = Mid(Sql, 1, Sql.Length - 11)
-														Sql = "Insert Into FilesDestinazione Select * From (" & Sql & ") As AA"
-														DB.EsegueSql(idProc, Sql, clLog)
-														Sql = ""
+														If Not Intelligente Then
+															Sql = Mid(Sql, 1, Sql.Length - 11)
+															Sql = "Insert Into FilesDestinazione Select * From (" & Sql & ") As AA"
+															DB.EsegueSql(idProc, Sql, clLog)
+															Sql = ""
+														End If
 													End If
 												End If
-											End If
 
-											If MetteInPausa Then
-												MetteInPausaLaRoutine()
-											End If
+												If MetteInPausa Then
+													MetteInPausaLaRoutine()
+												End If
 
-											If BloccaTutto Then
-												Exit For
-											End If
+												If BloccaTutto Then
+													Exit For
+												End If
 
-											Application.DoEvents()
+												Application.DoEvents()
+											End If
 										End If
-									End If
 								Next
 								If Not Intelligente And Sql <> "" Then
 									Sql = Mid(Sql, 1, Sql.Length - 11)
@@ -762,8 +798,8 @@ Public Class OperazioniSuFileDettagli
 					End If
 
 					ReDim Filetti(0)
-					ReDim DimensioneFiletti(0)
-					ReDim DataFiletti(0)
+					'ReDim DimensioneFiletti(0)
+					'ReDim DataFiletti(0)
 
 					' Copia i dati della sincronia intelligente nella tabella di appoggio per rendere più veloci le ricerche
 					If Not BloccaTutto Then
@@ -984,27 +1020,45 @@ Public Class OperazioniSuFileDettagli
 										Dim RitornoCopia As String = GF.CopiaFileFisico(FileOrigine, FileDestinazione, True, instance, lblContatore, s)
 										If RitornoCopia <> "SKIPPED" And Not RitornoCopia.Contains("ERRORE") Then
 											If Intelligente Then
+												Dim fl As FileInfo = Nothing
+												Dim dime As Long = -1
+												DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+
 												Try
-													Datella = FileDateTime(FileOrigine)
-													DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
+													fl = New FileInfo(FileOrigine)
 												Catch ex As Exception
-													DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+
 												End Try
+
+												If Not fl Is Nothing Then
+													Try
+														Datella = fl.LastWriteTime ' FileDateTime(FileOrigine)
+														DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
+													Catch ex As Exception
+														' DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+													End Try
+
+													Try
+														dime = fl.Length ' FileLen(FileOrigine)
+													Catch ex As Exception
+														'dime = -1
+													End Try
+												End If
 
 												Massimo += 1
 
-												Sql = "Insert Into FileDestinazioneIntelligente Values (" &
+													Sql = "Insert Into FileDestinazioneIntelligente Values (" &
 													" " & idProc & ", " &
 													" " & Progressivo & ", " &
 													" " & Massimo & ", " &
 													"'" & FileOrigine.Replace(Origine & "\", "").Replace("'", "''") & "', " &
-													" " & FileLen(FileOrigine) & ", " &
+													" " & dime & ", " &
 													"'" & DatellaFile & "' " &
 													")"
-												DB.EsegueSql(idProc, Sql, clLog)
-											End If
+													DB.EsegueSql(idProc, Sql, clLog)
+												End If
 
-											Try
+												Try
 												Dimens = Int(FileLen(FileOrigine) / 1024)
 												Tipo = "Kb."
 												If Dimens = 0 Then
@@ -1283,27 +1337,46 @@ Public Class OperazioniSuFileDettagli
 									Dim RitornoCopia As String = GF.CopiaFileFisico(FileOrigine, FileDestinazione, True, instance, lblContatore, s)
 									If RitornoCopia <> "SKIPPED" And Not RitornoCopia.Contains("ERRORE") Then
 										If Intelligente Then
+											Dim fl As FileInfo = Nothing
+											Dim dime As Long = -1
+											DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+
 											Try
-												Datella = FileDateTime(FileOrigine)
-												DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
+												fl = New FileInfo(FileOrigine)
 											Catch ex As Exception
-												DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+
 											End Try
+
+											If Not fl Is Nothing Then
+												Try
+													Datella = fl.LastWriteTime ' FileDateTime(FileOrigine)
+													' Datella = FileDateTime(FileOrigine)
+													DatellaFile = Datella.Year & "-" & Datella.Month & "-" & Datella.Day & " " & Datella.Hour & ":" & Datella.Minute & ":" & Datella.Second
+												Catch ex As Exception
+													' DatellaFile = Now.Year & "-" & Now.Month & "-" & Now.Day & " " & Now.Hour & ":" & Now.Minute & ":" & Now.Second
+												End Try
+
+												Try
+													dime = fl.Length ' FileLen(FileOrigine)
+												Catch ex As Exception
+													' dime = -1
+												End Try
+											End If
 
 											Massimo += 1
 
-											Sql = "Insert Into FileDestinazioneIntelligente Values (" &
+												Sql = "Insert Into FileDestinazioneIntelligente Values (" &
 												" " & idProc & ", " &
 												" " & Progressivo & ", " &
 												" " & Massimo & ", " &
 												"'" & FileOrigine.Replace(Origine & "\", "").Replace("'", "''") & "', " &
-												" " & FileLen(FileOrigine) & ", " &
+												" " & dime & ", " &
 												"'" & DatellaFile & "' " &
 												")"
-											DB.EsegueSql(idProc, Sql, clLog)
-										End If
+												DB.EsegueSql(idProc, Sql, clLog)
+											End If
 
-										Dimens = Int(FileLen(FileOrigine) / 1024)
+											Dimens = Int(FileLen(FileOrigine) / 1024)
 										Tipo = "Kb."
 										If Dimens = 0 Then
 											Dimens = FileLen(FileOrigine)
