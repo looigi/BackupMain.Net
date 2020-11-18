@@ -548,6 +548,19 @@ Public Class GestioneFilesDirectory
         End If
     End Sub
 
+    Public Sub ImpostaAttributiDirectory(SelectedPath As String)
+        Try
+            Dim di = New IO.DirectoryInfo(SelectedPath)
+            di.Attributes = FileAttributes.Normal
+
+            For Each i In di.EnumerateFileSystemInfos("*", SearchOption.AllDirectories)
+                i.Attributes = FileAttributes.Normal
+            Next
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
     Public Sub PulisceInfo()
         Erase FilesRilevati
         Erase DimensioneFilesRilevati

@@ -134,7 +134,7 @@ Module mdlGenerale
 
 
 	Public Function PrendeDataOra() As String
-		Dim Ritorno As String = Format(Now.Day, "00") & "/" & Format(Now.Month, "00") & "/" & Now.Year & " " & Format(Now.Hour, "00") & ":" & Format(Now.Minute, "00") & ":" & Format(Now.Second, "00")
+		Dim Ritorno As String = Format(Now.Day, "00") & " / " & Format(Now.Month, "00") & " / " & Now.Year & " " & Format(Now.Hour, "00") & ":" & Format(Now.Minute, "00") & ":" & Format(Now.Second, "00")
 
 		Return Ritorno
 	End Function

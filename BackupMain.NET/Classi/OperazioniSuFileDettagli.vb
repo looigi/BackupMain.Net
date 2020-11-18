@@ -122,172 +122,172 @@ Public Class OperazioniSuFileDettagli
                     FileOrigine = Filetti(i)
 
                     gf.EliminaFileFisico(FileOrigine)
-                    ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Elimina file " & gf.TornaNomeFileDaPath(Filetti(i)), gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False), ModalitaServizio, clLog)
-                End If
+					ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Elimina file " & gf.TornaNomeFileDaPath(Filetti(i)), gf.FormattaNumero(i, False) & " / " & gf.FormattaNumero(qFiletti, False), ModalitaServizio, clLog)
+				End If
 
-                If MetteInPausa Then
-                    MetteInPausaLaRoutine()
-                End If
+				If MetteInPausa Then
+					MetteInPausaLaRoutine()
+				End If
 
-                If BloccaTutto Then
-                    Exit For
-                End If
-            Next
-        Catch ex As Exception
-            ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "ERRORE: " & ex.Message, " ", ModalitaServizio, clLog)
-        End Try
+				If BloccaTutto Then
+					Exit For
+				End If
+			Next
+		Catch ex As Exception
+			ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "ERRORE: " & ex.Message, " ", ModalitaServizio, clLog)
+		End Try
 
-        Return log
-    End Function
+		Return log
+	End Function
 
-    Public Function EliminazioneDirectory(instance As Form, idProc As Integer, Origine As String,
-                                          lblOperazione As Label, lblContatore As Label,
-                                          ModalitaServizio As Boolean, clLog As LogCasareccio.LogCasareccio.Logger) As StringBuilder
-        ScriveLog(idProc, "ELIMINAZIONE DIRECTORY:", clLog)
+	Public Function EliminazioneDirectory(instance As Form, idProc As Integer, Origine As String,
+										  lblOperazione As Label, lblContatore As Label,
+										  ModalitaServizio As Boolean, clLog As LogCasareccio.LogCasareccio.Logger) As StringBuilder
+		ScriveLog(idProc, "ELIMINAZIONE DIRECTORY:", clLog)
 
-        log = New StringBuilder
+		log = New StringBuilder
 
-        Try
-            gf.ScansionaDirectorySingola(Origine, instance, "", lblOperazione, False)
+		Try
+			gf.ScansionaDirectorySingola(Origine, instance, "", lblOperazione, False)
 
-            ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "", "", ModalitaServizio, clLog)
+			ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "", "", ModalitaServizio, clLog)
 
-            Dim Filetti() As String = gf.RitornaFilesRilevati
-            Dim qFiletti As Long = gf.RitornaQuantiFilesRilevati
-            Dim Cartelle() As String = gf.RitornaDirectoryRilevate
-            Dim qCartelle As Long = gf.RitornaQuanteDirectoryRilevate
+			Dim Filetti() As String = gf.RitornaFilesRilevati
+			Dim qFiletti As Long = gf.RitornaQuantiFilesRilevati
+			Dim Cartelle() As String = gf.RitornaDirectoryRilevate
+			Dim qCartelle As Long = gf.RitornaQuanteDirectoryRilevate
 
-            For i As Long = 0 To qFiletti
-                If Filetti(i) <> "" Then
-                    'FileDestinazione = Origine & "\" & gf.TornaNomeFileDaPath(Filetti(i))
+			For i As Long = 0 To qFiletti
+				If Filetti(i) <> "" Then
+					'FileDestinazione = Origine & "\" & gf.TornaNomeFileDaPath(Filetti(i))
 
-                    ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Eliminazione file in directory " & gf.TornaNomeFileDaPath(Filetti(i)), i & "/" & qFiletti, ModalitaServizio, clLog)
+					ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Eliminazione file in directory " & gf.TornaNomeFileDaPath(Filetti(i)), i & " / " & qFiletti, ModalitaServizio, clLog)
 
-                    gf.EliminaFileFisico(Filetti(i))
-                End If
+					gf.EliminaFileFisico(Filetti(i))
+				End If
 
-                If MetteInPausa Then
-                    MetteInPausaLaRoutine()
-                End If
+				If MetteInPausa Then
+					MetteInPausaLaRoutine()
+				End If
 
-                If BloccaTutto Then
-                    Exit For
-                End If
-            Next
+				If BloccaTutto Then
+					Exit For
+				End If
+			Next
 
-            If MetteInPausa Then
-                MetteInPausaLaRoutine()
-            End If
+			If MetteInPausa Then
+				MetteInPausaLaRoutine()
+			End If
 
-            If Not BloccaTutto Then
-                For k As Integer = 1 To 3
-                    For i As Long = qCartelle To 0 Step -1
-                        If Cartelle(i) <> "" Then
-                            Try
-                                RmDir(Cartelle(i))
-                                ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Eliminazione directory " & Cartelle(i), i & "/" & qCartelle, ModalitaServizio, clLog)
-                            Catch ex As Exception
-                            End Try
-                        End If
+			If Not BloccaTutto Then
+				For k As Integer = 1 To 3
+					For i As Long = qCartelle To 0 Step -1
+						If Cartelle(i) <> "" Then
+							Try
+								RmDir(Cartelle(i))
+								ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Eliminazione directory " & Cartelle(i), i & " / " & qCartelle, ModalitaServizio, clLog)
+							Catch ex As Exception
+							End Try
+						End If
 
-                        If MetteInPausa Then
-                            MetteInPausaLaRoutine()
-                        End If
+						If MetteInPausa Then
+							MetteInPausaLaRoutine()
+						End If
 
-                        If BloccaTutto Then
-                            Exit For
-                        End If
-                    Next
+						If BloccaTutto Then
+							Exit For
+						End If
+					Next
 
-                    If MetteInPausa Then
-                        MetteInPausaLaRoutine()
-                    End If
+					If MetteInPausa Then
+						MetteInPausaLaRoutine()
+					End If
 
-                    If BloccaTutto Then
-                        Exit For
-                    End If
-                Next
-            End If
-        Catch ex As Exception
-            ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "ERRORE: " & ex.Message, " ", ModalitaServizio, clLog)
-        End Try
+					If BloccaTutto Then
+						Exit For
+					End If
+				Next
+			End If
+		Catch ex As Exception
+			ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "ERRORE: " & ex.Message, " ", ModalitaServizio, clLog)
+		End Try
 
-        Return log
-    End Function
+		Return log
+	End Function
 
-    Public Function CreaDirectory(instance As Form, idProc As Integer, Origine As String, Filtro As String, lblOperazione As Label, lblContatore As Label,
-                                  ModalitaServizio As Boolean, clLog As LogCasareccio.LogCasareccio.Logger) As StringBuilder
-        ScriveLog(idProc, "CREAZIONE DIRECTORY:", clLog)
+	Public Function CreaDirectory(instance As Form, idProc As Integer, Origine As String, Filtro As String, lblOperazione As Label, lblContatore As Label,
+								  ModalitaServizio As Boolean, clLog As LogCasareccio.LogCasareccio.Logger) As StringBuilder
+		ScriveLog(idProc, "CREAZIONE DIRECTORY:", clLog)
 
-        log = New StringBuilder
+		log = New StringBuilder
 
-        Try
-            FileOrigine = Origine & "\" & Filtro
+		Try
+			FileOrigine = Origine & "\" & Filtro
 
-            ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Creazione directory " & FileOrigine, " ", ModalitaServizio, clLog)
+			ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Creazione directory " & FileOrigine, " ", ModalitaServizio, clLog)
 
-            gf.CreaDirectoryDaPercorso(FileOrigine & "\")
-        Catch ex As Exception
-            ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "ERRORE: " & ex.Message, " ", ModalitaServizio, clLog)
-        End Try
+			gf.CreaDirectoryDaPercorso(FileOrigine & "\")
+		Catch ex As Exception
+			ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "ERRORE: " & ex.Message, " ", ModalitaServizio, clLog)
+		End Try
 
-        Return log
-    End Function
+		Return log
+	End Function
 
-    Public Function Copia(idProc As Integer, Operazione As Integer, Origine As String, Destinazione As String, qFiletti As Long,
-                          Filetti() As String, Sovrascrivi As String, lblOperazione As Label, lblContatore As Label, ModalitaServizio As Boolean,
-                          instance As Form, clLog As LogCasareccio.LogCasareccio.Logger) As StringBuilder
-        ScriveLog(idProc, "SPOSTAMENTO FILES: " & Origine & "->" & Destinazione, clLog)
+	Public Function Copia(idProc As Integer, Operazione As Integer, Origine As String, Destinazione As String, qFiletti As Long,
+						  Filetti() As String, Sovrascrivi As String, lblOperazione As Label, lblContatore As Label, ModalitaServizio As Boolean,
+						  instance As Form, clLog As LogCasareccio.LogCasareccio.Logger) As StringBuilder
+		ScriveLog(idProc, "SPOSTAMENTO FILES: " & Origine & "->" & Destinazione, clLog)
 
-        log = New StringBuilder
+		log = New StringBuilder
 
-        Try
-            Dim PathUlteriore As String = ""
+		Try
+			Dim PathUlteriore As String = ""
 
-            gf.ScansionaDirectorySingola(Origine, instance, "", lblOperazione, False)
+			gf.ScansionaDirectorySingola(Origine, instance, "", lblOperazione, False)
 
-            ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "", "", ModalitaServizio, clLog)
+			ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "", "", ModalitaServizio, clLog)
 
-            Filetti = gf.RitornaFilesRilevati
-            qFiletti = gf.RitornaQuantiFilesRilevati
+			Filetti = gf.RitornaFilesRilevati
+			qFiletti = gf.RitornaQuantiFilesRilevati
 
-            For i As Long = 0 To qFiletti
-                If Filetti(i) <> "" Then
-                    FileOrigine = Filetti(i)
-                    PathUlteriore = FileOrigine.Replace(Origine & "\", "")
-                    FileDestinazione = Destinazione & "\" & PathUlteriore ' & "\" & gf.TornaNomeFileDaPath(Filetti(i))
+			For i As Long = 0 To qFiletti
+				If Filetti(i) <> "" Then
+					FileOrigine = Filetti(i)
+					PathUlteriore = FileOrigine.Replace(Origine & "\", "")
+					FileDestinazione = Destinazione & "\" & PathUlteriore ' & "\" & gf.TornaNomeFileDaPath(Filetti(i))
 
-                    gf.CreaDirectoryDaPercorso(gf.TornaNomeDirectoryDaPath(FileDestinazione) & "\")
+					gf.CreaDirectoryDaPercorso(gf.TornaNomeDirectoryDaPath(FileDestinazione) & "\")
 
-                    Dim t As New ThreadAttesaOperazione
-                    t.EsegueControllo(instance, idProc, ModalitaServizio, clLog, FileDestinazione, log, lblOperazione, lblContatore, "Copia file " & gf.TornaNomeFileDaPath(FileOrigine))
+					Dim t As New ThreadAttesaOperazione
+					t.EsegueControllo(instance, idProc, ModalitaServizio, clLog, FileDestinazione, log, lblOperazione, lblContatore, "Copia file " & gf.TornaNomeFileDaPath(FileOrigine))
 
-                    gf.CopiaFileFisico(FileOrigine, FileDestinazione, IIf(Sovrascrivi = "S", True, False))
+					gf.CopiaFileFisico(FileOrigine, FileDestinazione, IIf(Sovrascrivi = "S", True, False))
 
-                    t.Blocca(lblOperazione)
+					t.Blocca(lblOperazione)
 
-                    If Operazione = OperazioniSuFile.TipoOperazione.Spostamento Then
-                        gf.EliminaFileFisico(FileOrigine)
-                        ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Sposta file " & gf.TornaNomeFileDaPath(Filetti(i)), gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False), ModalitaServizio, clLog)
-                    Else
-                        ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Copia file " & gf.TornaNomeFileDaPath(Filetti(i)), gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False), ModalitaServizio, clLog)
-                    End If
-                End If
+					If Operazione = OperazioniSuFile.TipoOperazione.Spostamento Then
+						gf.EliminaFileFisico(FileOrigine)
+						ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Sposta file " & gf.TornaNomeFileDaPath(Filetti(i)), gf.FormattaNumero(i, False) & " / " & gf.FormattaNumero(qFiletti, False), ModalitaServizio, clLog)
+					Else
+						ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Copia file " & gf.TornaNomeFileDaPath(Filetti(i)), gf.FormattaNumero(i, False) & " / " & gf.FormattaNumero(qFiletti, False), ModalitaServizio, clLog)
+					End If
+				End If
 
-                If MetteInPausa Then
-                    MetteInPausaLaRoutine()
-                End If
+				If MetteInPausa Then
+					MetteInPausaLaRoutine()
+				End If
 
-                If BloccaTutto Then
-                    Exit For
-                End If
-            Next
-        Catch ex As Exception
-            ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "ERRORE: " & ex.Message, " ", ModalitaServizio, clLog)
-        End Try
+				If BloccaTutto Then
+					Exit For
+				End If
+			Next
+		Catch ex As Exception
+			ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "ERRORE: " & ex.Message, " ", ModalitaServizio, clLog)
+		End Try
 
-        Return log
-    End Function
+		Return log
+	End Function
 
 	Public Function Sincronizza(idProc As Integer, Progressivo As Integer, Origine As String, Destinazione As String, Filtro As String,
 								lblOper As Label, lblCont As Label, Intelligente As Boolean, ModalitaServizio As Boolean, instance As Form,
@@ -511,35 +511,35 @@ Public Class OperazioniSuFileDettagli
 									" " & dime & " As Dimensioni, " &
 									"'" & DatellaFile & "' As Dataora From VersioneDB " &
 									" Union All "
-									' DB.EsegueSql(idProc, Sql, clLog)
+								' DB.EsegueSql(idProc, Sql, clLog)
 
-									If IsNothing(lblContatore) = False Then
-										If i / 20 = Int(i / 20) Then
-											'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
-											If instance.InvokeRequired Then
-												instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
-											Else
-												lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
-											End If
-
-											Sql = Mid(Sql, 1, Sql.Length - 11)
-											Sql = "Insert Into FilesOrigine Select * From (" & Sql & ") As AA"
-											DB.EsegueSql(idProc, Sql, clLog)
-											Sql = ""
+								If IsNothing(lblContatore) = False Then
+									If i / 20 = Int(i / 20) Then
+										'lblContatore.Text = gf.FormattaNumero(i, False) & " / " & gf.FormattaNumero(qFiletti, False)
+										If instance.InvokeRequired Then
+											instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(qFiletti, False))
+										Else
+											lblContatore.Text = GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(qFiletti, False)
 										End If
-									End If
 
-									If MetteInPausa Then
-										MetteInPausaLaRoutine()
+										Sql = Mid(Sql, 1, Sql.Length - 11)
+										Sql = "Insert Into FilesOrigine Select * From (" & Sql & ") As AA"
+										DB.EsegueSql(idProc, Sql, clLog)
+										Sql = ""
 									End If
-
-									If BloccaTutto Then
-										Exit For
-									End If
-
-									Application.DoEvents()
 								End If
+
+								If MetteInPausa Then
+									MetteInPausaLaRoutine()
+								End If
+
+								If BloccaTutto Then
+									Exit For
+								End If
+
+								Application.DoEvents()
 							End If
+						End If
 					Next
 					If Sql <> "" Then
 						Sql = Mid(Sql, 1, Sql.Length - 11)
@@ -549,11 +549,11 @@ Public Class OperazioniSuFileDettagli
 					End If
 
 					If IsNothing(lblContatore) = False Then
-						'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
+						'lblContatore.Text = gf.FormattaNumero(i, False) & " / " & gf.FormattaNumero(qFiletti, False)
 						If instance.InvokeRequired Then
-							instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(qFiletti, False) & "/" & GF.FormattaNumero(qFiletti, False))
+							instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(qFiletti, False) & " / " & GF.FormattaNumero(qFiletti, False))
 						Else
-							lblContatore.Text = GF.FormattaNumero(qFiletti, False) & "/" & GF.FormattaNumero(qFiletti, False)
+							lblContatore.Text = GF.FormattaNumero(qFiletti, False) & " / " & GF.FormattaNumero(qFiletti, False)
 						End If
 					End If
 				End If
@@ -697,7 +697,7 @@ Public Class OperazioniSuFileDettagli
 											End If
 
 											If Intelligente Then
-													Sql = "Insert Into FileDestinazioneIntelligente Values (" &
+												Sql = "Insert Into FileDestinazioneIntelligente Values (" &
 													" " & idProc & ", " &
 													" " & Progressivo & ", " &
 													" " & (i + 1) & ", " &
@@ -705,51 +705,51 @@ Public Class OperazioniSuFileDettagli
 													" " & dime & ", " &
 													"'" & DatellaFile & "' " &
 													")"
-													DB.EsegueSql(idProc, Sql, clLog)
-												Else
-													Sql &= "Select " &
+												DB.EsegueSql(idProc, Sql, clLog)
+											Else
+												Sql &= "Select " &
 													"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "' As File, " &
 													" " & dime & " As Dimensioni, " &
 													"'" & DatellaFile & "' As DataOra From VersioneDB " &
 													" Union All "
 
-													'Sql = "Insert Into FilesDestinazione Values (" &
-													'	"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "', " &
-													'	" " & DimensioneFiletti(i) & ", " &
-													'	"'" & DatellaFile & "' " &
-													'	")"
-												End If
-												Massimo = i + 1
+												'Sql = "Insert Into FilesDestinazione Values (" &
+												'	"'" & Filetti(i).Replace("'", "''").Replace(Destinazione & "\", "") & "', " &
+												'	" " & DimensioneFiletti(i) & ", " &
+												'	"'" & DatellaFile & "' " &
+												'	")"
+											End If
+											Massimo = i + 1
 
-												If IsNothing(lblContatore) = False Then
-													If i / 20 = Int(i / 20) Then
-														'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
-														If instance.InvokeRequired Then
-															instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False))
-														Else
-															lblContatore.Text = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(qFiletti, False)
-														End If
+											If IsNothing(lblContatore) = False Then
+												If i / 20 = Int(i / 20) Then
+													'lblContatore.Text = gf.FormattaNumero(i, False) & " / " & gf.FormattaNumero(qFiletti, False)
+													If instance.InvokeRequired Then
+														instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(qFiletti, False))
+													Else
+														lblContatore.Text = GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(qFiletti, False)
+													End If
 
-														If Not Intelligente Then
-															Sql = Mid(Sql, 1, Sql.Length - 11)
-															Sql = "Insert Into FilesDestinazione Select * From (" & Sql & ") As AA"
-															DB.EsegueSql(idProc, Sql, clLog)
-															Sql = ""
-														End If
+													If Not Intelligente Then
+														Sql = Mid(Sql, 1, Sql.Length - 11)
+														Sql = "Insert Into FilesDestinazione Select * From (" & Sql & ") As AA"
+														DB.EsegueSql(idProc, Sql, clLog)
+														Sql = ""
 													End If
 												End If
-
-												If MetteInPausa Then
-													MetteInPausaLaRoutine()
-												End If
-
-												If BloccaTutto Then
-													Exit For
-												End If
-
-												Application.DoEvents()
 											End If
+
+											If MetteInPausa Then
+												MetteInPausaLaRoutine()
+											End If
+
+											If BloccaTutto Then
+												Exit For
+											End If
+
+											Application.DoEvents()
 										End If
+									End If
 								Next
 								If Not Intelligente And Sql <> "" Then
 									Sql = Mid(Sql, 1, Sql.Length - 11)
@@ -759,11 +759,11 @@ Public Class OperazioniSuFileDettagli
 								End If
 
 								If IsNothing(lblContatore) = False Then
-									'lblContatore.Text = gf.FormattaNumero(i, False) & "/" & gf.FormattaNumero(qFiletti, False)
+									'lblContatore.Text = gf.FormattaNumero(i, False) & " / " & gf.FormattaNumero(qFiletti, False)
 									If instance.InvokeRequired Then
-										instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(qFiletti, False) & "/" & GF.FormattaNumero(qFiletti, False))
+										instance.Invoke(MethodDelegateAddTextContatore, GF.FormattaNumero(qFiletti, False) & " / " & GF.FormattaNumero(qFiletti, False))
 									Else
-										lblContatore.Text = GF.FormattaNumero(qFiletti, False) & "/" & GF.FormattaNumero(qFiletti, False)
+										lblContatore.Text = GF.FormattaNumero(qFiletti, False) & " / " & GF.FormattaNumero(qFiletti, False)
 									End If
 								End If
 							End If
@@ -903,7 +903,7 @@ Public Class OperazioniSuFileDettagli
 
 							If FilesDaElaborare.Count > TotaleFiles Then
 								' If MsgBox("Troppi files da eliminare. Proseguo con l'operazione ?", vbYesNo + vbInformation + vbDefaultButton2) = vbNo Then
-								ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Troppi files da eliminare (" & FilesDaElaborare.Count & "/" & TotaleFiles & "). Skippo l'operazione", " ", ModalitaServizio, clLog)
+								ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Troppi files da eliminare (" & FilesDaElaborare.Count & " / " & TotaleFiles & "). Skippo l'operazione", " ", ModalitaServizio, clLog)
 								Ok = False
 								' End If
 							End If
@@ -922,7 +922,7 @@ Public Class OperazioniSuFileDettagli
 											DB.EsegueSql(idProc, Sql, clLog)
 										End If
 
-										ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Eliminazione file:" & vbCrLf & GF.TagliaLunghezzaScritta(FilesDaElaborare.Item(i), LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
+										ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Eliminazione file:" & vbCrLf & GF.TagliaLunghezzaScritta(FilesDaElaborare.Item(i), LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
 									End If
 
 									If MetteInPausa Then
@@ -1012,11 +1012,11 @@ Public Class OperazioniSuFileDettagli
 										Dim t As New ThreadAttesaOperazione
 										GF.CreaDirectoryDaPercorso(GF.TornaNomeDirectoryDaPath(FileDestinazione) & "\")
 
-										t.EsegueControllo(instance, idProc, ModalitaServizio, clLog, FileDestinazione, log, lblOperazione, lblContatore, "Controllo file " & GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False) & ": " & GF.TornaNomeFileDaPath(FileOrigine))
+										t.EsegueControllo(instance, idProc, ModalitaServizio, clLog, FileDestinazione, log, lblOperazione, lblContatore, "Controllo file " & GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False) & ": " & GF.TornaNomeFileDaPath(FileOrigine))
 
-										Dim s As String = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False)
+										Dim s As String = GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False)
 										' ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Copia file " & GF.TornaNomeFileDaPath(FileOrigine), " ", ModalitaServizio, clLog)
-										ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Aggiorna file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte) & vbCrLf & GF.FormattaNumero(Dimens, False) & " " & Tipo, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
+										ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Aggiorna file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte) & vbCrLf & GF.FormattaNumero(Dimens, False) & " " & Tipo, GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
 										Dim RitornoCopia As String = GF.CopiaFileFisico(FileOrigine, FileDestinazione, True, instance, lblContatore, s)
 										If RitornoCopia <> "SKIPPED" And Not RitornoCopia.Contains("ERRORE") Then
 											If Intelligente Then
@@ -1047,7 +1047,7 @@ Public Class OperazioniSuFileDettagli
 
 												Massimo += 1
 
-													Sql = "Insert Into FileDestinazioneIntelligente Values (" &
+												Sql = "Insert Into FileDestinazioneIntelligente Values (" &
 													" " & idProc & ", " &
 													" " & Progressivo & ", " &
 													" " & Massimo & ", " &
@@ -1055,10 +1055,10 @@ Public Class OperazioniSuFileDettagli
 													" " & dime & ", " &
 													"'" & DatellaFile & "' " &
 													")"
-													DB.EsegueSql(idProc, Sql, clLog)
-												End If
+												DB.EsegueSql(idProc, Sql, clLog)
+											End If
 
-												Try
+											Try
 												Dimens = Int(FileLen(FileOrigine) / 1024)
 												Tipo = "Kb."
 												If Dimens = 0 Then
@@ -1070,15 +1070,15 @@ Public Class OperazioniSuFileDettagli
 											End Try
 										Else
 											If RitornoCopia.Contains("ERRORE") Then
-												ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, RitornoCopia & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
+												ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, RitornoCopia & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
 											Else
-												ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Skip file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
+												ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Skip file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
 											End If
 										End If
 
 										t.Blocca(lblOperazione)
 									Else
-										ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "File di origine non presente:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
+										ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "File di origine non presente:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
 									End If
 
 									If MetteInPausa Then
@@ -1110,7 +1110,7 @@ Public Class OperazioniSuFileDettagli
 								For Each cd As String In CartelleOrig
 									If cd <> "" Then
 										If i / 20 = Int(i / 20) Then
-											ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Scrittura tabella origine", i & "/" & qCartelleOrig, ModalitaServizio, clLog)
+											ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Scrittura tabella origine", i & " / " & qCartelleOrig, ModalitaServizio, clLog)
 											If Sql <> "" Then
 												Sql = Mid(Sql, 1, Sql.Length - 11)
 												Sql = "Insert Into DirectOrig Select * From (" & Sql & ") As AA"
@@ -1143,7 +1143,7 @@ Public Class OperazioniSuFileDettagli
 								For Each cd As String In CartelleDest
 									If cd <> "" Then
 										If i / 20 = Int(i / 20) Then
-											ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Scrittura tabella destin.", i & "/" & qCartelleDest, ModalitaServizio, clLog)
+											ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Scrittura tabella destin.", i & " / " & qCartelleDest, ModalitaServizio, clLog)
 											Sql = Mid(Sql, 1, Sql.Length - 11)
 											Sql = "Insert Into DirectDest Select * From (" & Sql & ") As AA"
 											DB.EsegueSql(idProc, Sql, clLog)
@@ -1165,6 +1165,16 @@ Public Class OperazioniSuFileDettagli
 									DB.EsegueSql(idProc, Sql, clLog)
 								End If
 
+								'Dim o As New OperazioniSuFile
+								'Dim mud As New MapUnMapDrives
+								Dim QualePercorso As String = Destinazione
+
+								'Dim discoLibero As String = o.PrendeLetteraDiscoLibero
+								'If Destinazione.StartsWith("\\") Then
+								'	mud.MappaDiscoDiRete(discoLibero, Destinazione, "looigimycloud", "looigi227")
+								'	QualePercorso = discoLibero & ":"
+								'End If
+
 								ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Lettura directory da eliminare", "", ModalitaServizio, clLog)
 								Sql = "Select * From DirectDest Where Nome Not In (Select Nome From DirectOrig)"
 								Rec2 = DB.LeggeQuery(idProc, Sql, clLog)
@@ -1172,10 +1182,10 @@ Public Class OperazioniSuFileDettagli
 								i = 0
 								Do Until Rec2.EOF
 									If i / 100 = Int(i / 100) Then
-										ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Eliminazione tabella" & GF.TagliaLunghezzaScritta(Destinazione & Rec2("Nome").Value, LunghezzaMassimaScritte), i & "/" & CartelleDaEliminare.Count, ModalitaServizio, clLog)
+										ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Eliminazione cartella " & GF.TagliaLunghezzaScritta(Destinazione & Rec2("Nome").Value, LunghezzaMassimaScritte), i & " / " & CartelleDaEliminare.Count, ModalitaServizio, clLog)
 									End If
 									i += 1
-									CartelleDaEliminare.Add(Destinazione & Rec2("Nome").Value)
+									CartelleDaEliminare.Add(QualePercorso & Rec2("Nome").Value)
 
 									Rec2.MoveNext()
 								Loop
@@ -1188,10 +1198,10 @@ Public Class OperazioniSuFileDettagli
 								i = 0
 								Do Until Rec2.EOF
 									If i / 100 = Int(i / 100) Then
-										ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Creazione tabella" & GF.TagliaLunghezzaScritta(Destinazione & Rec2("Nome").Value, LunghezzaMassimaScritte), i & "/" & CartelleDaEliminare.Count, ModalitaServizio, clLog)
+										ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Creazione tabella" & GF.TagliaLunghezzaScritta(Destinazione & Rec2("Nome").Value, LunghezzaMassimaScritte), i & " / " & CartelleDaEliminare.Count, ModalitaServizio, clLog)
 									End If
 									i += 1
-									CartelleDaAggiungere.Add(Destinazione & Rec2("Nome").Value)
+									CartelleDaAggiungere.Add(QualePercorso & Rec2("Nome").Value)
 
 									Rec2.MoveNext()
 								Loop
@@ -1200,7 +1210,10 @@ Public Class OperazioniSuFileDettagli
 								i = 0
 								Dim qc As Long = CartelleDaEliminare.Count
 								For Each c As String In CartelleDaEliminare
-									ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Eliminazione cartella: " & vbCrLf & GF.TagliaLunghezzaScritta(c, LunghezzaMassimaScritte), i & "/" & qc, ModalitaServizio, clLog)
+									ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Eliminazione cartella: " & vbCrLf & GF.TagliaLunghezzaScritta(c, LunghezzaMassimaScritte), i & " / " & qc, ModalitaServizio, clLog)
+
+									GF.ImpostaAttributiDirectory(c)
+
 									Try
 										Directory.Delete(c, True)
 									Catch ex As Exception
@@ -1212,7 +1225,7 @@ Public Class OperazioniSuFileDettagli
 								i = 0
 								qc = CartelleDaAggiungere.Count
 								For Each c As String In CartelleDaAggiungere
-									ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Eliminazione cartella: " & vbCrLf & GF.TagliaLunghezzaScritta(c, LunghezzaMassimaScritte), i & "/" & qc, ModalitaServizio, clLog)
+									ScriveOperazione(instance, False, idProc, log, lblOperazione, lblContatore, "Eliminazione cartella: " & vbCrLf & GF.TagliaLunghezzaScritta(c, LunghezzaMassimaScritte), i & " / " & qc, ModalitaServizio, clLog)
 									Try
 										Directory.CreateDirectory(c)
 									Catch ex As Exception
@@ -1220,6 +1233,10 @@ Public Class OperazioniSuFileDettagli
 									End Try
 									i += 1
 								Next
+
+								'If Destinazione.StartsWith("\\") Then
+								'	mud.SMappaDiscoDiRete(discoLibero, False)
+								'End If
 
 								If MetteInPausa Then
 									MetteInPausaLaRoutine()
@@ -1328,12 +1345,12 @@ Public Class OperazioniSuFileDettagli
 								FileOrigine = Origine & "\" & FilesDaElaborare.Item(i)
 								FileDestinazione = Destinazione & "\" & FilesDaElaborare.Item(i)
 
-								' ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Controllo file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte) & vbCrLf & GF.FormattaNumero(Dimens, False) & " " & Tipo, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
+								' ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Controllo file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte) & vbCrLf & GF.FormattaNumero(Dimens, False) & " " & Tipo, GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
 
 								If File.Exists(FileOrigine) Then
 									GF.CreaDirectoryDaPercorso(GF.TornaNomeDirectoryDaPath(FileDestinazione) & "\")
-									Dim s As String = GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False)
-									ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Copia file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte) & vbCrLf & GF.FormattaNumero(Dimens, False) & " " & Tipo, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
+									Dim s As String = GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False)
+									ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Copia file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte) & vbCrLf & GF.FormattaNumero(Dimens, False) & " " & Tipo, GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
 									Dim RitornoCopia As String = GF.CopiaFileFisico(FileOrigine, FileDestinazione, True, instance, lblContatore, s)
 									If RitornoCopia <> "SKIPPED" And Not RitornoCopia.Contains("ERRORE") Then
 										If Intelligente Then
@@ -1365,7 +1382,7 @@ Public Class OperazioniSuFileDettagli
 
 											Massimo += 1
 
-												Sql = "Insert Into FileDestinazioneIntelligente Values (" &
+											Sql = "Insert Into FileDestinazioneIntelligente Values (" &
 												" " & idProc & ", " &
 												" " & Progressivo & ", " &
 												" " & Massimo & ", " &
@@ -1373,25 +1390,25 @@ Public Class OperazioniSuFileDettagli
 												" " & dime & ", " &
 												"'" & DatellaFile & "' " &
 												")"
-												DB.EsegueSql(idProc, Sql, clLog)
-											End If
+											DB.EsegueSql(idProc, Sql, clLog)
+										End If
 
-											Dimens = Int(FileLen(FileOrigine) / 1024)
+										Dimens = Int(FileLen(FileOrigine) / 1024)
 										Tipo = "Kb."
 										If Dimens = 0 Then
 											Dimens = FileLen(FileOrigine)
 											Tipo = "b."
 										End If
-										ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Copiato file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte) & vbCrLf & GF.FormattaNumero(Dimens, False) & " " & Tipo, GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
+										ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Copiato file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte) & vbCrLf & GF.FormattaNumero(Dimens, False) & " " & Tipo, GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
 									Else
 										If RitornoCopia.Contains("ERRORE") Then
-											ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, RitornoCopia & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
+											ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, RitornoCopia & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
 										Else
-											ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Skipped file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
+											ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "Skipped file:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
 										End If
 									End If
 								Else
-									ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "File di origine non presente:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & "/" & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
+									ScriveOperazione(instance, True, idProc, log, lblOperazione, lblContatore, "File di origine non presente:" & vbCrLf & GF.TagliaLunghezzaScritta(FileOrigine, LunghezzaMassimaScritte), GF.FormattaNumero(i, False) & " / " & GF.FormattaNumero(FilesDaElaborare.Count, False), ModalitaServizio, clLog)
 								End If
 
 								If MetteInPausa Then

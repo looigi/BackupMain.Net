@@ -3,6 +3,11 @@ Imports System.Runtime.InteropServices
 
 Public Class MapUnMapDrives
     Private Declare Function WNetAddConnection2 Lib "mpr.dll" Alias "WNetAddConnection2A" (ByRef lpNetResource As NETRESOURCE, ByVal lpPassword As String, ByVal lpUserName As String, ByVal dwFlags As Integer) As Integer
+    Public Const RESOURCETYPE_DISK As Long = &H1
+    Private Const ERROR_BAD_NETPATH = 53&
+    Private Const ERROR_NETWORK_ACCESS_DENIED = 65&
+    Private Const ERROR_INVALID_PASSWORD = 86&
+    Private Const ERROR_NETWORK_BUSY = 54&
 
     Private Structure NETRESOURCE
         Public dwScope As Integer
@@ -25,7 +30,6 @@ Public Class MapUnMapDrives
         Return LetteraDisco
     End Function
 
-    Private Const RESOURCETYPE_DISK As Long = &H1
     Private Declare Function WNetCancelConnection Lib "mpr.dll" Alias "WNetCancelConnectionA" (ByVal lpszName As String, ByVal bForce As Long) As Long 'do we force the disconnect or not
 
     Private Sub Attendi(Secondi As Integer)
@@ -36,8 +40,8 @@ Public Class MapUnMapDrives
         Loop
     End Sub
 
-    Public Function MappaDiscoDiRete(Percorso As String, sUtente As String, sPassword As String) As Boolean
-        Dim Lettera As String = RitornaLetteraLibera()
+    Public Function MappaDiscoDiRete(Lettera As String, Percorso As String, sUtente As String, sPassword As String) As Boolean
+        ' Dim Lettera As String = RitornaLetteraLibera()
         Dim sPercorso As String = Percorso
 
         If Mid(sPercorso, sPercorso.Length, 1) = "\" Then
@@ -58,19 +62,34 @@ Public Class MapUnMapDrives
         strPassword = sPassword
         nr.dwType = RESOURCETYPE_DISK
 
-        Dim result As Integer = 0
-
-        Try
-            result = WNetAddConnection2(nr, strPassword, strUsername, 1)
-        Catch ex As Exception
-
-        End Try
+        Dim result As Integer
+        result = WNetAddConnection2(nr, strPassword, strUsername, 0)
 
         If result = 0 Then
             Return True
         Else
+            Select Case result
+                Case ERROR_BAD_NETPATH
+                    'statusBarMsg("QA4001I", "Bad path could not connect to Star Directory")
+                    Return "Bad path could not connect to Star Directory"
+                Case ERROR_INVALID_PASSWORD
+                    'statusBarMsg("QA4002I", "Invalid password could not connect to Star Directory")
+                    Return "Invalid password could not connect to Star Directory"
+                Case ERROR_NETWORK_ACCESS_DENIED
+                    'statusBarMsg("QA4003I", "Network access denied could not connect to Star Directory")
+                    Return "Network access denied could not connect to Star Directory"
+                Case ERROR_NETWORK_BUSY
+                    'statusBarMsg("QA4004I", "Network busy could not connect to Star Directory")
+                    Return "Network busy could not connect to Star Directory"
+            End Select
             Return False
         End If
+
+        'If result = 0 Then
+        '    Return True
+        'Else
+        '    Return False
+        'End If
 
         Attendi(2)
     End Function

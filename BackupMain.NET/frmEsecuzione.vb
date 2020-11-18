@@ -197,6 +197,16 @@ Public Class frmEsecuzione
 			End If
 
 			If Vai Then
+				InPausa = False
+				Blocca = False
+				Skippa = False
+
+				'cmdPausa.Enabled = True
+				'cmdStop.Enabled = True
+				'cmdSkip.Enabled = True
+
+				cmdRipristina.Visible = False
+
 				log.Append(opeFileGlobale.EsegueOperazione(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, Me, idProc, ProgressivoInterno, Operazione, Origine, Destinazione, Filtro, Sovrascrivi, SottoDirectory, lblOperazione, lblContatore,
 													   UtenzaOrigine, PasswordOrigine, UtenzaDestinazione, Passworddestinazione, False, clLog))
 			End If
@@ -263,6 +273,7 @@ Public Class frmEsecuzione
 		End If
 
 		Dim Progressivo As String = Rec(Riga, StrutturaTabella.Progressivo)
+		' MsgBox(Progressivo)
 
 		lstOperazioni.SelectedIndex = -1
 		For i As Integer = 0 To lstOperazioni.Items.Count - 1
@@ -274,6 +285,10 @@ Public Class frmEsecuzione
 
 		ProgressivoInterno = Progressivo
 		tmrCheckFineThread.Enabled = True
+
+		cmdPausa.Enabled = True
+		cmdStop.Enabled = True
+		cmdSkip.Enabled = True
 
 		trd = New Thread(AddressOf EsegueOperazione)
 		trd.IsBackground = True
@@ -403,15 +418,20 @@ Public Class frmEsecuzione
                 cmdSkip.Enabled = False
 
                 If ModalitaEsecuzioneAutomatica Then
-                    Try
-                        File.Delete(PercorsoDBTemp)
-                    Catch ex As Exception
+					Try
+						File.Delete(PercorsoDBTemp)
+					Catch ex As Exception
 
-                    End Try
-                    'NotifyIcon1.Visible = False
+					End Try
 
-                    End
-                Else
+					Try
+						NotifyIcon1.Visible = False
+					Catch ex As Exception
+
+					End Try
+
+					End
+				Else
                     MsgBox("Elaborazione effettuata", MsgBoxStyle.Information)
                 End If
             Else

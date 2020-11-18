@@ -5,7 +5,7 @@ Public Class RoutineVarie
     Public Sub ScriveLogServizio(idProc As Integer, Log As String)
         Try
             Dim gf As New GestioneFilesDirectory
-            Dim Datella As String = Format(Now.Day, "00") & "/" & Format(Now.Month, "00") & "/" & Now.Year & " " & Format(Now.Hour, "00") & ":" & Format(Now.Minute, "00") & ":" & Format(Now.Second, "00")
+            Dim Datella As String = Format(Now.Day, "00") & " / " & Format(Now.Month, "00") & " / " & Now.Year & " " & Format(Now.Hour, "00") & ":" & Format(Now.Minute, "00") & ":" & Format(Now.Second, "00")
             gf.ApreFileDiTestoPerScrittura("C:\BackupLog\Servizio.txt")
             gf.ScriveTestoSuFileAperto("Procedura: " & idProc & " " & Datella & " -> " & Log)
             gf.ChiudeFileDiTestoDopoScrittura()

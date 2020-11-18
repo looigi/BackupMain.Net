@@ -277,6 +277,8 @@ Public Class frmProcedura
 			Sql = "Delete From DettaglioProcedure Where idProc=" & idProc & " And Progressivo=" & lblProgressivo.Text
 			DB.EsegueSql(idProc, Sql, Nothing)
 
+			Threading.Thread.Sleep(1000)
+
 			Dim opFile As New OperazioniSuFile
 			idProc = opFile.CaricaRigheProcedura(ModalitaEsecuzioneAutomatica, PercorsoDBTemp, lblNomeProc.Text, lstOperazioni)
 			opFile = Nothing
@@ -506,22 +508,22 @@ Public Class frmProcedura
 	End Sub
 
 	Private Sub OrdinaOperazioni(idProc As Integer, DB As GestioneACCESS)
-		Dim Sql As String = "Drop Table Appoggio"
-		DB.EsegueSql(idProc, Sql, Nothing)
+		'Dim Sql As String = "Drop Table Appoggio"
+		'DB.EsegueSql(idProc, Sql, Nothing)
 
-		Sql = "SELECT idProc, (SELECT Count(*) FROM DettaglioProcedure T2 WHERE t2.Origine+str(t2.Progressivo) < DettaglioProcedure.Origine+str(DettaglioProcedure.Progressivo)) As Progressivo, " &
-			"idOperazione, Origine, Destinazione, Sovrascrivi, Sottodirectory, Filtro, Parametro, UtenzaOrigine, PasswordOrigine, UtenzaDestinazione, PasswordDestinazione, Attivo " &
-			"Into Appoggio " &
-			"FROM DettaglioProcedure " &
-			"WHERE idProc = " & idProc & " " &
-			"ORDER BY DettaglioProcedure.Origine, DettaglioProcedure.Destinazione"
-		DB.EsegueSql(idProc, Sql, Nothing)
+		'Sql = "SELECT idProc, (SELECT Count(*) FROM DettaglioProcedure T2 WHERE t2.Origine+str(t2.Progressivo) < DettaglioProcedure.Origine+str(DettaglioProcedure.Progressivo)) As Progressivo, " &
+		'	"idOperazione, Origine, Destinazione, Sovrascrivi, Sottodirectory, Filtro, Parametro, UtenzaOrigine, PasswordOrigine, UtenzaDestinazione, PasswordDestinazione, Attivo " &
+		'	"Into Appoggio " &
+		'	"FROM DettaglioProcedure " &
+		'	"WHERE idProc = " & idProc & " " &
+		'	"ORDER BY DettaglioProcedure.Origine, DettaglioProcedure.Destinazione"
+		'DB.EsegueSql(idProc, Sql, Nothing)
 
-		Sql = "Delete * From DettaglioProcedure Where idProc = " & idProc
-		DB.EsegueSql(idProc, Sql, Nothing)
+		'Sql = "Delete * From DettaglioProcedure Where idProc = " & idProc
+		'DB.EsegueSql(idProc, Sql, Nothing)
 
-		Sql = "Insert Into DettaglioProcedure Select * From Appoggio"
-		DB.EsegueSql(idProc, Sql, Nothing)
+		'Sql = "Insert Into DettaglioProcedure Select * From Appoggio"
+		'DB.EsegueSql(idProc, Sql, Nothing)
 	End Sub
 
 	Private Sub cmbOperazioni_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbOperazioni.SelectedIndexChanged
@@ -933,7 +935,7 @@ Public Class frmProcedura
 			opFiles = Nothing
 
 			Try
-				mud.MappaDiscoDiRete(Cartella, Utenza, Password)
+				mud.MappaDiscoDiRete(LetteraDisco, Cartella, Utenza, Password)
 			Catch ex As Exception
 				Messaggio = ex.Message
 			End Try

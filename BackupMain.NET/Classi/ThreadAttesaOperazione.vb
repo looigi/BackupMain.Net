@@ -144,7 +144,7 @@ Public Class ThreadAttesaOperazione
                 Lunghezza = "0 B."
             End If
 
-            ScriveOperazione(instanceThread, True, idProcThread, Log, lblOperazione, lblContatore, lblOperazione.Text, "File: " & gf.TornaNomeFileDaPath(e.CurrentEntry.FileName) & " " & Lunghezza & vbCrLf & Attuale & "/" & Totale, ModalitaServizioThread, clLogThread, False)
+            ScriveOperazione(instanceThread, True, idProcThread, Log, lblOperazione, lblContatore, lblOperazione.Text, "File: " & gf.TornaNomeFileDaPath(e.CurrentEntry.FileName) & " " & Lunghezza & vbCrLf & Attuale & " / " & Totale, ModalitaServizioThread, clLogThread, False)
         ElseIf e.EventType = ZipProgressEventType.Saving_Completed Then
             ContatoreUscita = 0
 
