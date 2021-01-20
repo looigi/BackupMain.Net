@@ -507,44 +507,48 @@ Public Class GestioneFilesDirectory
         End If
 
         If Directory.Exists(Percorso) Then
-            Dim di As New IO.DirectoryInfo(Percorso)
-            Dim diar1 As IO.DirectoryInfo() = di.GetDirectories
-            Dim dra As IO.DirectoryInfo
+            Try
+                Dim di As New IO.DirectoryInfo(Percorso)
+                Dim diar1 As IO.DirectoryInfo() = di.GetDirectories
+                Dim dra As IO.DirectoryInfo
 
-            For Each dra In diar1
-                If MetteInPausa Then
-                    MetteInPausaLaRoutine()
-                End If
-
-                If BloccaTutto Then
-                    Exit For
-                End If
-
-                Conta += 1
-                If Conta >= RefreshLabel Then
-                    Conta = 0
-                    If lblAggiornamento Is Nothing = False Then
-                        Dim mess As String = "Lettura " & TagliaLunghezzaScritta(Percorso, 55) & vbCrLf & "Cartelle: " & FormattaNumero(QuanteDirRilevate, False) & " - Files: " & FormattaNumero(QuantiFilesRilevati, False)
-                        If instance.InvokeRequired Then
-                            instance.Invoke(MethodDelegateAddText, mess)
-                        Else
-                            Me.lblAggiornamento.Text = mess
-                        End If
-                        Application.DoEvents()
+                For Each dra In diar1
+                    If MetteInPausa Then
+                        MetteInPausaLaRoutine()
                     End If
-                End If
 
-                QuanteDirRilevate += 1
-                If QuanteDirRilevate > DimensioniArrayAttualeDir Then
-                    DimensioniArrayAttualeDir += 10000
-                    ReDim Preserve DirectoryRilevate(DimensioniArrayAttualeDir)
-                End If
-                DirectoryRilevate(QuanteDirRilevate) = dra.FullName
+                    If BloccaTutto Then
+                        Exit For
+                    End If
 
-                LeggeFilesDaDirectory(instance, dra.FullName, Filtro, lblAggiornamento)
+                    Conta += 1
+                    If Conta >= RefreshLabel Then
+                        Conta = 0
+                        If lblAggiornamento Is Nothing = False Then
+                            Dim mess As String = "Lettura " & TagliaLunghezzaScritta(Percorso, 55) & vbCrLf & "Cartelle: " & FormattaNumero(QuanteDirRilevate, False) & " - Files: " & FormattaNumero(QuantiFilesRilevati, False)
+                            If instance.InvokeRequired Then
+                                instance.Invoke(MethodDelegateAddText, mess)
+                            Else
+                                Me.lblAggiornamento.Text = mess
+                            End If
+                            Application.DoEvents()
+                        End If
+                    End If
 
-                LeggeTutto(instance, dra.FullName, Filtro, lblAggiornamento)
-            Next
+                    QuanteDirRilevate += 1
+                    If QuanteDirRilevate > DimensioniArrayAttualeDir Then
+                        DimensioniArrayAttualeDir += 10000
+                        ReDim Preserve DirectoryRilevate(DimensioniArrayAttualeDir)
+                    End If
+                    DirectoryRilevate(QuanteDirRilevate) = dra.FullName
+
+                    LeggeFilesDaDirectory(instance, dra.FullName, Filtro, lblAggiornamento)
+
+                    LeggeTutto(instance, dra.FullName, Filtro, lblAggiornamento)
+                Next
+            Catch ex As Exception
+
+            End Try
         End If
     End Sub
 
@@ -589,57 +593,62 @@ Public Class GestioneFilesDirectory
         End If
 
         If Directory.Exists(Percorso) Then
-            Dim di As New IO.DirectoryInfo(Percorso)
-            Dim fiar1 As IO.FileInfo() = di.GetFiles
-            Dim fra As IO.FileInfo
-            Dim Ok As Boolean = True
-            Dim Filtri() As String = Filtro.Split(";")
+            Try
+                Dim di As New IO.DirectoryInfo(Percorso)
+                Dim fiar1 As IO.FileInfo() = di.GetFiles
+                Dim fra As IO.FileInfo
+                Dim Ok As Boolean = True
+                Dim Filtri() As String = Filtro.Split(";")
 
-            For Each fra In fiar1
-                If MetteInPausa Then
-                    MetteInPausaLaRoutine()
-                End If
-
-                Ok = True
-                If Filtri.Length > 0 Then
-                    Ok = False
-                    For Each f In Filtri
-                        If fra.FullName.ToUpper.Trim.Contains(f.ToUpper.Trim.Replace("*", "")) Then
-                            Ok = True
-                            Exit For
-                        End If
-                    Next
-                End If
-
-                If Ok Then
-                    QuantiFilesRilevati += 1
-                    If QuantiFilesRilevati > DimensioniArrayAttualeFiles Then
-                        DimensioniArrayAttualeFiles += 10000
-                        ReDim Preserve FilesRilevati(DimensioniArrayAttualeFiles)
-                        ReDim Preserve DimensioneFilesRilevati(DimensioniArrayAttualeFiles)
-                        ReDim Preserve DataFilesRilevati(DimensioniArrayAttualeFiles)
+                For Each fra In fiar1
+                    If MetteInPausa Then
+                        MetteInPausaLaRoutine()
                     End If
-                    FilesRilevati(QuantiFilesRilevati) = fra.FullName
-                    DimensioneFilesRilevati(QuantiFilesRilevati) = fra.Length
-                    DataFilesRilevati(QuantiFilesRilevati) = fra.LastWriteTime
-                End If
 
-                If BloccaTutto Then
-                    Exit For
-                End If
-
-                If QuantiFilesRilevati / RefreshLabel = Int(QuantiFilesRilevati / RefreshLabel) Then
-                    If IsNothing(lblAggiornamento) = False Then
-                        Dim mess As String = "Lettura " & TagliaLunghezzaScritta(Percorso, 55) & vbCrLf & "Cartelle: " & FormattaNumero(QuanteDirRilevate, False) & " - Files: " & FormattaNumero(QuantiFilesRilevati, False)
-                        If instance.InvokeRequired Then
-                            instance.Invoke(MethodDelegateAddText, mess)
-                        Else
-                            Me.lblAggiornamento.Text = mess
-                        End If
+                    Ok = True
+                    If Filtri.Length > 0 Then
+                        Ok = False
+                        For Each f In Filtri
+                            If fra.FullName.ToUpper.Trim.Contains(f.ToUpper.Trim.Replace("*", "")) Then
+                                Ok = True
+                                Exit For
+                            End If
+                        Next
                     End If
-                    Application.DoEvents()
-                End If
-            Next
+
+                    If Ok Then
+                        QuantiFilesRilevati += 1
+                        If QuantiFilesRilevati > DimensioniArrayAttualeFiles Then
+                            DimensioniArrayAttualeFiles += 10000
+                            ReDim Preserve FilesRilevati(DimensioniArrayAttualeFiles)
+                            ReDim Preserve DimensioneFilesRilevati(DimensioniArrayAttualeFiles)
+                            ReDim Preserve DataFilesRilevati(DimensioniArrayAttualeFiles)
+                        End If
+                        FilesRilevati(QuantiFilesRilevati) = fra.FullName
+                        DimensioneFilesRilevati(QuantiFilesRilevati) = fra.Length
+                        DataFilesRilevati(QuantiFilesRilevati) = fra.LastWriteTime
+                    End If
+
+                    If BloccaTutto Then
+                        Exit For
+                    End If
+
+                    If QuantiFilesRilevati / RefreshLabel = Int(QuantiFilesRilevati / RefreshLabel) Then
+                        If IsNothing(lblAggiornamento) = False Then
+                            Dim mess As String = "Lettura " & TagliaLunghezzaScritta(Percorso, 55) & vbCrLf & "Cartelle: " & FormattaNumero(QuanteDirRilevate, False) & " - Files: " & FormattaNumero(QuantiFilesRilevati, False)
+                            If instance.InvokeRequired Then
+                                instance.Invoke(MethodDelegateAddText, mess)
+                            Else
+                                Me.lblAggiornamento.Text = mess
+                            End If
+                        End If
+                        Application.DoEvents()
+                    End If
+                Next
+
+            Catch ex As Exception
+
+            End Try
         End If
     End Sub
 
